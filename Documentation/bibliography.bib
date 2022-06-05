@@ -1,0 +1,56 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MPI applications %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@inproceedings{10.1145/3295500.3356176,
+author = {Laguna, Ignacio and Marshall, Ryan and Mohror, Kathryn and Ruefenacht, Martin and Skjellum, Anthony and Sultana, Nawrin},
+title = {A Large-Scale Study of MPI Usage in Open-Source HPC Applications},
+year = {2019},
+isbn = {9781450362290},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3295500.3356176},
+doi = {10.1145/3295500.3356176},
+abstract = {Understanding the state-of-the-practice in MPI usage is paramount for many aspects of supercomputing, including optimizing the communication of HPC applications and informing standardization bodies and HPC systems procurements regarding the most important MPI features. Unfortunately, no previous study has characterized the use of MPI on applications at a significant scale; previous surveys focus either on small data samples or on MPI jobs of specific HPC centers. This paper presents the first comprehensive study of MPI usage in applications. We survey more than one hundred distinct MPI programs covering a significantly large space of the population of MPI applications. We focus on understanding the characteristics of MPI usage with respect to the most used features, code complexity, and programming models and languages. Our study corroborates certain findings previously reported on smaller data samples and presents a number of interesting, previously un-reported insights.},
+booktitle = {Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis},
+articleno = {31},
+numpages = {14},
+keywords = {program analysis, applications survey, MPI},
+location = {Denver, Colorado},
+series = {SC '19}
+}
+
+@article{GROPP201998,
+title = {Using node and socket information to implement MPI Cartesian topologies},
+journal = {Parallel Computing},
+volume = {85},
+pages = {98-108},
+year = {2019},
+issn = {0167-8191},
+doi = {https://doi.org/10.1016/j.parco.2019.01.001},
+url = {https://www.sciencedirect.com/science/article/pii/S0167819118303156},
+author = {William D. Gropp},
+keywords = {Message passing, MPI, Process topology, Cartesian process topology},
+abstract = {The MPI API provides support for Cartesian process topologies, including the option to reorder the processes to achieve better communication performance. But MPI implementations rarely provide anything useful for the reorder option, typically ignoring it. One argument made is that modern interconnects are fast enough that applications are less sensitive to the exact layout of processes onto the system. However, intranode communication performance is much greater than internode communication performance. In this paper, we show a simple approach that takes into account only information about which MPI processes are on the same node to provide a fast and effective implementation of the MPI Cartesian topology routine. While not optimal, this approach provides a significant improvement over all tested MPI implementations and provides an implementation that may be used as the default in any MPI implementation of MPI_Cart_create. We also explore the impact of taking into account the mapping of processes to processor chips or sockets, and show that this is both relatively easy to accomplish but provides only a small improvement in performance.}
+}
+
+@INPROCEEDINGS{1592864,
+  author={Traff, J.L.},
+  booktitle={SC '02: Proceedings of the 2002 ACM/IEEE Conference on Supercomputing},
+  title={Implementing the MPI Process Topology Mechanism},
+  year={2002},
+  volume={},
+  number={},
+  pages={28-28},
+  doi={10.1109/SC.2002.10045}}
+
+@article{AMARAL2020102584,
+title = {Programming languages for data-Intensive HPC applications: A systematic mapping study},
+journal = {Parallel Computing},
+volume = {91},
+pages = {102584},
+year = {2020},
+issn = {0167-8191},
+doi = {https://doi.org/10.1016/j.parco.2019.102584},
+url = {https://www.sciencedirect.com/science/article/pii/S0167819119301759},
+author = {Vasco Amaral and Beatriz Norberto and Miguel Goulão and Marco Aldinucci and Siegfried Benkner and Andrea Bracciali and Paulo Carreira and Edgars Celms and Luís Correia and Clemens Grelck and Helen Karatza and Christoph Kessler and Peter Kilpatrick and Hugo Martiniano and Ilias Mavridis and Sabri Pllana and Ana Respício and José Simão and Luís Veiga and Ari Visa},
+keywords = {High performance computing (HPC), Big data, Data-intensive applications, Programming languages, Domain-Specific language (DSL), General-Purpose language (GPL), Systematic mapping study (SMS)},
+abstract = {A major challenge in modelling and simulation is the need to combine expertise in both software technologies and a given scientific domain. When High-Performance Computing (HPC) is required to solve a scientific problem, software development becomes a problematic issue. Considering the complexity of the software for HPC, it is useful to identify programming languages that can be used to alleviate this issue. Because the existing literature on the topic of HPC is very dispersed, we performed a Systematic Mapping Study (SMS) in the context of the European COST Action cHiPSet. This literature study maps characteristics of various programming languages for data-intensive HPC applications, including category, typical user profiles, effectiveness, and type of articles. We organised the SMS in two phases. In the first phase, relevant articles are identified employing an automated keyword-based search in eight digital libraries. This lead to an initial sample of 420 papers, which was then narrowed down in a second phase by human inspection of article abstracts, titles and keywords to 152 relevant articles published in the period 2006–2018. The analysis of these articles enabled us to identify 26 programming languages referred to in 33 of relevant articles. We compared the outcome of the mapping study with results of our questionnaire-based survey that involved 57 HPC experts. The mapping study and the survey revealed that the desired features of programming languages for data-intensive HPC applications are portability, performance and usability. Furthermore, we observed that the majority of the programming languages used in the context of data-intensive HPC applications are text-based general-purpose programming languages. Typically these have a steep learning curve, which makes them difficult to adopt. We believe that the outcome of this study will inspire future research and development in programming languages for data-intensive HPC applications.}
+}

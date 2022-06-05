@@ -1,0 +1,46 @@
+#+TITLE: MPI Communicator Profiling Tool
+#+OPTIONS: ^:nil toc:nil
+#+BIBLIOGRAPHY: bibliography plain
+
+* Introduction
+# 1. MPI Collectives are an important part of the MPI applications.
+# 2. A critical component of the MPI collectives is the communicator.
+# 3. The communicator defines a safe communication context for message passing.
+#    a. can also define the communication pattern
+# 4. Communicators can also carry the topological structure when created using topology constructors.
+
+# MPI applications frequently use collective communication primitives to perform communication operations among numerous processes. The work of \cite{10.1145/3295500.3356176} indicates that MPI collective communication is used even more frequently than the corresponding point to point communication.
+# MPI applications comprise a significant part of the HPC applications.
+# A significant part of the HPC applications consists for MPI applications.
+# Communication between the processes in MPI takes place in specific communication contexts. A typical communication context that is used almost by every communication operation is provided by the communicator. Besides containing contexts of communication for both point to point and collective communication,
+
+Message Passing Interface (MPI) has been the most common programming model for HPC applications for the last twenty years \cite{AMARAL2020102584}. A critical abstraction of the MPI for communication is the communicator which is used to define safe communication context between the processes of a group. In general, communicators are used for almost every communication operation, both collective and point to point. Additionally, the intra-communicators can be used to cache the data concerning the virtual process topology. The virtual topology characterizes the logical communication pattern of the application and can be exploited by the runtime system to produce a more efficient mapping to the processing elements.  MPI defines Cartesian, Graph and Distributed graph topologies. In order to define any of these topologies, the corresponding MPI functions, create a new communicator where the necessary attributes are cached. Although efficient mappings can improve application's performance, the MPI implementation rarely takes advantage of the "reorder" option to derive those mappings. Additionally, only a small subset of popular MPI applications use the virtual topology mechanisms \cite{10.1145/3295500.3356176}.  This leads to the "chicken and egg" problem as it is expressed in \cite{GROPP201998}, where developers do not make use of the MPI virtual topologies and thus, MPI implementations do not see the need to optimize these routines. Furthermore, even if these topology related routines are optimized it is important to be able to evaluate them using real-world MPI applications. The first step towards tackling this issue is being able to acquire all the necessary information related to the topology features. By having precise information regarding the use of communicators with topology features it is possible to characterize applications based not only whether they are using those topology routines but also the way they use them. This means the traffic volume for each communicator, the MPI communications calls performed in every communicator as well as the time spent performing them. Finding out whether an application uses the virtual topology routines is simple by looking at the source code. However, in this way, it is not possible to obtain information regarding the volume and frequency of the MPI communication in each communicator.  Such information can be provided by profiling communicators which contain valuable information regarding the use of such features. However, this information is not provided by the current state of the art MPI profilers which are not communicator-centric. Another crucial piece of information that can be obtained by communicator-centric profiling is the accurate number of collective communication calls. By tracking the MPI calls per process a profiler is able to count the number of every call. However, this can be misleading for counting the number of collective calls and specifically when those calls use different communicators. This is another case where communicator-centric profiling can improve by keeping track of both the MPI call and the communicator.  In this work we have implemented a novel MPI profiler featuring communicator-centric profiling. The novel profiler is able to obtain information on the data volume, the communication primitives and also their frequency for every communicator of the application.
+
+# However, finding suitable applications is no easy task, as stated before few of them use the topology features but more importantly even if some applications use them those details are not available. A way to obtain such information is to profile the MPI application and specifically the communicators it utilizes. The capability of profiling the communicators of an MPI application in order to obtain information about the traffic and frequency as well as the general structure is not available with the current MPI profilers.
+
+# To tackle these issues it is important to be able to identify the way that those virtual topology mechanisms are used by the communication primitives.
+
+# Therefore, a communicator might be able to define the communication pattern  of a collective communication operation. As a result, depending on the application, it can have a serious impact on the application's performance. It is therefore important to be able obtain information related to the characteristics and usage of the communicators by the MPI applications. Such information is valuable for determining the efficiency of certain MPI library features such as the implementation of process topology communicators. Process topology mechanisms, although rarely implemented, can improve the application's communication \cite{1592864}.
+
+# An essential component for performing collective communication is the communicator which besides defining a safe communication context for message passing, it can also have information about the virtual process topology of the application.
+
+* Motivation
+
+# 1. Why do we create this tool and do not use the existing tools?
+#    a. Is it better?
+#       a. What makes it better?
+#    b. Is it different?
+#       a. What makes it different?
+#       b. Why do we care about profiling in another way?
+#       c. Could more care about it?
+
+* Contribution
+* Notes
+# ** Book of 2012 with profiling tools which also references scoreP
+# - There is a good argument there "Creating a Tool Set for Optimizing Topology-Aware Node Mappings". Could we sell it like this? A tool for Optimizing Topology-Aware Node mappings.
+
+* Bibliography
+#+BEGIN_SRC latex
+\bibliographystyle{plain}
+\bibliography{bibliography}
+#+END_SRC
