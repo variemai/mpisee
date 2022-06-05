@@ -120,6 +120,6 @@ getProcCmdLine (int *ac, char **av)
     fclose (infile);
   }
   else{
-    mcpt_abort("Error opening file %s FILE:LINE = %d",file,__FILE__,__LINE__);
+    mcpt_abort("Error opening file %d %d",__FILE__,__LINE__);
   }
 }
