@@ -18,7 +18,8 @@ target_compile_options(mpisee PRIVATE ${MPI_C_COMPILE_FLAGS})
 target_link_libraries(mpisee PRIVATE ${MPI_C_LIBRARIES} ${MPI_CXX_LINK_FLAGS})
 target_link_libraries(mpisee PUBLIC datastructlib)
 set_target_properties(mpisee PROPERTIES SOVERSION 1)
-#add_subdirectory(test)
+enable_testing()
+add_subdirectory(test)
 #add_test(Barrier )
 
 

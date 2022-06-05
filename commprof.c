@@ -13,8 +13,9 @@
 #include "symbols.h"
 #endif
 
-#include "table.h"
+#include "./datastructlib/table.h"
 #include <inttypes.h>
+#include "commprof.h"
 
 #define MAX_ARGS 1024
 #define MAX_DIMS 8
@@ -36,7 +37,7 @@ char *mpisee_build_time = __TIME__;
 double total_time = 0.0;
 
 
-static int
+int
 namedel(MPI_Comm comm, int keyval, void *attr, void *s)
 {
   prof_attrs *com = (prof_attrs*)attr;
@@ -44,7 +45,7 @@ namedel(MPI_Comm comm, int keyval, void *attr, void *s)
   return MPI_SUCCESS;
 }
 
-static int
+int
 namekey()
 {
   // hidden key value for type attributes
@@ -2261,7 +2262,7 @@ _Finalize()
             tmp++;
         }
         fprintf(fpp, "'\n");
-        fprintf(fpp,"#'Mapping:'");
+        fprintf(fpp,"# Mapping:'");
         for ( i =0; i<size; i++ ){
             if ( ptr != NULL ){
                 snprintf(proc_name, MPI_MAX_PROCESSOR_NAME, ptr);
