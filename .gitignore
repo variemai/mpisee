@@ -67,3 +67,4 @@ profiles/*.R*
 .Rproj.user
 .ccls-cache/
 CMakeFiles/
+build/

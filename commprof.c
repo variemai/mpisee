@@ -202,13 +202,15 @@ _MPI_Init(int *argc, char ***argv){
     /*     communicators[i] = MPI_COMM_NULL; */
     /*     local_comms[i] = NULL; */
     /* } */
-    if ( rank == 0 ){
-        appname = (char*)malloc(sizeof(char)*1024);
-        appname = get_appname();
-        printf("MPI_Init: MPI Communicator Profiling Tool\nProfiling application\
- %s\n",appname);
-        fflush(stdout);
-    }
+
+ /*    if ( rank == 0 ){ */
+ /*        appname = (char*)malloc(sizeof(char)*1024); */
+ /*        appname = get_appname(); */
+ /*        printf("MPI_Init: MPI Communicator Profiling Tool\nProfiling application\ */
+ /* %s\n",appname); */
+ /*        fflush(stdout); */
+ /*    } */
+
     /* Debuggin file please remove when running */
     /* dbg_file = fopen("MCPT_%d\n","w"); */
     communicator = (prof_attrs*) malloc (sizeof(prof_attrs));
@@ -263,13 +265,15 @@ _MPI_Init_thread(int *argc, char ***argv, int required, int *provided){
     /*     communicators[i] = MPI_COMM_NULL; */
     /*     local_comms[i] = NULL; */
     /* } */
-    if ( rank == 0 ){
-        appname = (char*)malloc(sizeof(char)*1024);
-        appname = get_appname();
-        printf("MPI_Init_thread: MPI Communicator Profiling Tool\nProfiling\
- application %s\n",appname);
-        fflush(stdout);
-    }
+
+ /*    if ( rank == 0 ){ */
+ /*        appname = (char*)malloc(sizeof(char)*1024); */
+ /*        appname = get_appname(); */
+ /*        printf("MPI_Init_thread: MPI Communicator Profiling Tool\nProfiling\ */
+ /* application %s\n",appname); */
+ /*        fflush(stdout); */
+ /*    } */
+
     /* Debuggin file please remove when running */
     /* dname = (char*) malloc (32); */
     /* sprintf(dname, "MCPT_%d", rank); */
@@ -351,8 +355,10 @@ F77_MPI_INIT (int *ierr)
 int
 MPI_Init(int *argc, char ***argv)
 {
-    if ( argc != NULL  )
-        getProcCmdLine (&ac, av);
+
+
+    //getProcCmdLine (&ac, av);
+
     /* int i; */
     /* printf("NUM OF ARGS = %d\n",*argc); */
     /* if ( argc != NULL && *argc > 0 && argv != NULL ){ */
