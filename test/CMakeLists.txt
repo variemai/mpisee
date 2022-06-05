@@ -3,11 +3,21 @@ find_package(MPI REQUIRED)
 
 add_executable(ctest0 ctest0.c)
 add_executable(ctest1 ctest1.c)
-add_test(ctest0 ctest0)
-add_test(ctest1 ctest1)
+add_test(NAME ctest0 COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ctest0)
+add_test(NAME ctest1 COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ctest1)
 target_link_libraries(ctest0 PUBLIC mpisee)
 target_link_libraries(ctest1 PUBLIC mpisee)
 #set_property(TARGET ctest0 PROPERTY CROSSCOMPILING_EMULATOR '${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS}')
+# set(MPI_COMMAND mpirun -np 2 ctest0)
+# add_custom_command(
+#   TARGET ctest0
+#   POST_BUILD
+#   COMMAND ${MPI_COMMAND})
+#   set(MPI_COMMAND mpirun -np 2 ctest1)
+# add_custom_command(
+#   TARGET ctest1
+#   POST_BUILD
+#   COMMAND ${MPI_COMMAND})
 target_include_directories(ctest0 PRIVATE ${MPI_C_INCLUDE_PATH})
 target_compile_options(ctest0 PRIVATE ${MPI_C_COMPILE_FLAGS})
 target_link_libraries(ctest0 PRIVATE ${MPI_C_LIBRARIES} ${MPI_CXX_LINK_FLAGS})
