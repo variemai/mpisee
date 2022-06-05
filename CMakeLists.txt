@@ -11,14 +11,14 @@ add_library(mpisee SHARED
   )
 target_include_directories(mpisee PUBLIC "$(PROJECT_SOURCE_DIR)/datastructlib")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -I./datastructlib")
-configure_file(commprofConfig.h.in commprofConfig.h)
+#configure_file(commprofConfig.h.in commprofConfig.h)
 target_include_directories(mpisee PRIVATE ${MPI_C_INCLUDE_PATH})
 target_compile_options(mpisee PRIVATE ${MPI_C_COMPILE_FLAGS})
 #target_link_libraries(mpisee PUBLIC ${MPI_C_LIB_NAMES})
 target_link_libraries(mpisee PRIVATE ${MPI_C_LIBRARIES} ${MPI_CXX_LINK_FLAGS})
 target_link_libraries(mpisee PUBLIC datastructlib)
 set_target_properties(mpisee PROPERTIES SOVERSION 1)
-add_subdirectory(test)
+#add_subdirectory(test)
 #add_test(Barrier )
 
 

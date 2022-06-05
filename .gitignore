@@ -55,6 +55,8 @@ dkms.conf
 # Makefile metadata
 compile_commands.json
 .cache/
+.cmake
+Makefile*
 
 .auctex*
 *.tex
@@ -64,3 +66,4 @@ test/*.csv
 profiles/*.R*
 .Rproj.user
 .ccls-cache/
+CMakeFiles/
