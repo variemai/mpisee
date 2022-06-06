@@ -1,6 +1,6 @@
 #include "utils.h"
 #include "symbols.h"
-#define MAX_ARG_STRING_SIZE 4096
+#include <string.h>
 
 const char prim_names[][NUM_OF_PRIMS]={
 "Send",
@@ -43,11 +43,13 @@ const char prim_names[][NUM_OF_PRIMS]={
 
 char *appname = NULL;
 prof_attrs **comm_table = NULL;
+int ac;
+char **av;
 
 void mcpt_abort (char *fmt, ...){
   va_list args;
   va_start (args, fmt);
-  fprintf (stderr, "\n\n: MPICP ABORTING ");
+  fprintf (stderr, "\n\n: mpisee ABORTING ");
   vfprintf (stderr, fmt, args);
   va_end (args);
   fflush (stderr);
@@ -121,5 +123,27 @@ getProcCmdLine (int *ac, char **av)
   }
   else{
     mcpt_abort("Error opening file %d %d",__FILE__,__LINE__);
+  }
+}
+
+
+/* void */
+/* getRunCmd(int argc, char *argv[]){ */
+/*   int i; */
+/*   ac = argc; */
+/*   av = (char**) malloc ( sizeof(char)*ac*MAX_ARG_SIZE ); */
+/*   for ( i =0; i<ac; i++ ){ */
+/*     strcpy(argv[i], av[i]); */
+/*   } */
+/* } */
+
+
+void
+getRunCmd(int argc, char *argv[]){
+  int i;
+  ac = argc;
+  av = (char**) malloc ( sizeof(char*)*ac );
+  for ( i =0; i<ac; i++ ){
+      av[i] = strdup(argv[i]);
   }
 }

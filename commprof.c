@@ -17,7 +17,6 @@
 #include <inttypes.h>
 #include "commprof.h"
 
-#define MAX_ARGS 1024
 #define MAX_DIMS 8
 
 int prof_enabled = 1;
@@ -25,13 +24,11 @@ prof_attrs **local_data = NULL;
 prof_attrs **local_comms = NULL;
 int local_cid= 0;
 int my_coms = 1;
-int ac;
-char *av[MAX_ARGS];
 Table_T request_tab;
 
 /* Tool date */
 int mpisee_major_version = 0;
-int mpisee_minor_version = 1;
+int mpisee_minor_version = 2;
 char *mpisee_build_date = __DATE__;
 char *mpisee_build_time = __TIME__;
 double total_time = 0.0;
@@ -2244,10 +2241,10 @@ _Finalize()
         fprintf(fpp, "#'MPI LIBRARY' '%s'\n",version);
         fprintf(fpp, "#'Processes' '%d'\n",size);
         fprintf(fpp, "#'Run command' ");
-        fprintf(fpp, "'%s",av[0]);
-        for ( i = 1; i<ac && i<MAX_ARGS; i++ ){
-            fprintf(fpp, " %s",av[i]);
-        }
+        /* fprintf(fpp, "'%s",av[0]); */
+        /* for ( i = 1; i<ac && i<MAX_ARGS; i++ ){ */
+        /*     fprintf(fpp, " %s",av[i]); */
+        /* } */
         fprintf(fpp, "'\n");
 
         fprintf(fpp, "#'mpisee Version' '%d.%d'\n",mpisee_major_version,mpisee_minor_version);

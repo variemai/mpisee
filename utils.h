@@ -12,6 +12,9 @@
 #define NAMELEN 256
 #define PRIMLEN 16
 #define NUM_OF_PRIMS 36
+#define MAX_ARG_STRING_SIZE 4096
+#define MAX_ARGS 1024
+#define MAX_ARG_SIZE 64
 
 enum primitives{
 Send,           /* DO NOT ADD ANYHTING BEFORE THIS */
@@ -71,10 +74,14 @@ typedef struct request_data{
 /* Globals */
 extern char *appname;
 extern const char prim_names[][NUM_OF_PRIMS];
+extern int ac;
+extern char **av;
 
 void mcpt_abort (char *fmt, ...);
 
 void getProcCmdLine (int *ac, char **av);
 char * get_appname(void);
+
+void getRunCmd(int argc, char *argv[]);
 
 #endif // UTILS_H_

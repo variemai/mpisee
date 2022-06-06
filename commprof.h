@@ -11,8 +11,6 @@ extern prof_attrs **local_data;
 extern prof_attrs **local_comms;
 extern int local_cid;
 extern int my_coms;
-extern int ac;
-extern char *av[MAX_ARGS];
 extern Table_T request_tab;
 
 int namekey();
