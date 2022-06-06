@@ -14,10 +14,6 @@ int main (int argc, char *argv[]){
         printf("%s\n",av[i]);
     }
 
-  for ( i =0; i<ac; i++ ){
-      free(av[i]);
-  }
-  free(av);
    MPI_Finalize();
-    return 0;
+   return 0;
 }

@@ -365,7 +365,8 @@ MPI_Init(int *argc, char ***argv)
     /*             av[i]=strdup(*argv[i]); */
     /*     } */
     /* } */
-    getRunCmd(*argc, *argv);
+    if ( argc != NULL  )
+        getRunCmd(*argc, *argv);
     return _MPI_Init(argc, argv);
 }
 
@@ -2241,10 +2242,9 @@ _Finalize()
         fprintf(fpp, "#'MPI LIBRARY' '%s'\n",version);
         fprintf(fpp, "#'Processes' '%d'\n",size);
         fprintf(fpp, "#'Run command' ");
-        /* fprintf(fpp, "'%s",av[0]); */
-        /* for ( i = 1; i<ac && i<MAX_ARGS; i++ ){ */
-        /*     fprintf(fpp, " %s",av[i]); */
-        /* } */
+        for ( i = 0; i<ac; i++ ){
+            fprintf(fpp, " %s",av[i]);
+        }
         fprintf(fpp, "'\n");
 
         fprintf(fpp, "#'mpisee Version' '%d.%d'\n",mpisee_major_version,mpisee_minor_version);
