@@ -5,7 +5,6 @@
 #include "../utils.h"
 #include "../commprof.h"
 #include <assert.h>
-#define NUMPROCS 8
 
 int main (int argc, char *argv[]){
     int size,flag,rank;
