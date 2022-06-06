@@ -139,7 +139,7 @@ getProcCmdLine (int *ac, char **av)
 
 
 void
-getRunCmd(int argc, char *argv[]){
+getRunCmd(int argc, char **argv){
   int i;
   ac = argc;
   av = (char**) malloc ( sizeof(char*)*ac );

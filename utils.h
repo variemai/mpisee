@@ -82,6 +82,6 @@ void mcpt_abort (char *fmt, ...);
 void getProcCmdLine (int *ac, char **av);
 char * get_appname(void);
 
-void getRunCmd(int argc, char *argv[]);
+void getRunCmd(int argc, char **argv);
 
 #endif // UTILS_H_

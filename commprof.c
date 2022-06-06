@@ -365,7 +365,7 @@ MPI_Init(int *argc, char ***argv)
     /*             av[i]=strdup(*argv[i]); */
     /*     } */
     /* } */
-
+    getRunCmd(*argc, *argv);
     return _MPI_Init(argc, argv);
 }
 
