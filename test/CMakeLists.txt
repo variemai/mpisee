@@ -3,10 +3,11 @@ find_package(MPI REQUIRED)
 
 add_executable(ctest0 ctest0.c)
 add_executable(ctest1 ctest1.c)
-add_test(NAME ctest0 COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ctest0)
-add_test(NAME ctest1 COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ctest1)
+add_test(NAME ctest0 COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/ctest0)
+add_test(NAME ctest1 COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/ctest1)
 target_link_libraries(ctest0 PUBLIC mpisee)
 target_link_libraries(ctest1 PUBLIC mpisee)
+message(STATUS "Test: ${PROJECT_BINARY_DIR}")
 #set_property(TARGET ctest0 PROPERTY CROSSCOMPILING_EMULATOR '${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS}')
 # set(MPI_COMMAND mpirun -np 2 ctest0)
 # add_custom_command(
