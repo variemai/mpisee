@@ -1,0 +1,7 @@
+#+title: Readme
+
+* mpisee: profiling MPI applications for communication and communicator structure
+* Tests
+** Metamorphic relations
+- Call Bcast (or any rooted) with different root but with the same buffer size
+- Think of more metamorphic relations
