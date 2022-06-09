@@ -4,13 +4,26 @@ find_package(MPI REQUIRED)
 add_executable(ctest0 ctest0.c)
 add_executable(ctest1 ctest1.c)
 add_executable(ctest_input ctest_input.c)
+add_executable(ctest_inputv ctest_inputv.c)
+add_executable(bcast_mt bcast_mt.c)
+add_executable(bcast_reduce_mt bcast_reduce_mt.c)
+
+
 add_test(NAME ctest0 COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/ctest0)
 add_test(NAME ctest1 COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/ctest1)
-add_test(NAME ctest_input COMMAND ${PROJECT_BINARY_DIR}/test/ctest_input -n 1032 -f file.txt -q abcdr -W)
+add_test(NAME ctest_input COMMAND  ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/ctest_input -n 1032 -f file.txt -q abcdr -W)
+add_test(NAME ctest_inputv COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/ctest_inputv)
+add_test(NAME bcast_mt COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/bcast_mt)
+add_test(NAME bcast_reduce_mt COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/bcast_reduce_mt)
+
+
 target_link_libraries(ctest0 PUBLIC mpisee)
 target_link_libraries(ctest1 PUBLIC mpisee)
 target_link_libraries(ctest_input PUBLIC mpisee)
-message(STATUS "Test: ${PROJECT_BINARY_DIR}")
+target_link_libraries(ctest_inputv PUBLIC mpisee)
+target_link_libraries(bcast_mt PUBLIC mpisee)
+target_link_libraries(bcast_reduce_mt PUBLIC mpisee)
+
 #set_property(TARGET ctest0 PROPERTY CROSSCOMPILING_EMULATOR '${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS}')
 # set(MPI_COMMAND mpirun -np 2 ctest0)
 # add_custom_command(
@@ -36,3 +49,18 @@ target_include_directories(ctest_input PRIVATE ${MPI_C_INCLUDE_PATH})
 target_compile_options(ctest_input PRIVATE ${MPI_C_COMPILE_FLAGS})
 target_link_libraries(ctest_input PRIVATE ${MPI_C_LIBRARIES} ${MPI_CXX_LINK_FLAGS})
 target_include_directories(ctest_input PUBLIC "${PROJECT_SOURCE_DIR}/")
+
+target_include_directories(ctest_inputv PRIVATE ${MPI_C_INCLUDE_PATH})
+target_compile_options(ctest_inputv PRIVATE ${MPI_C_COMPILE_FLAGS})
+target_link_libraries(ctest_inputv PRIVATE ${MPI_C_LIBRARIES} ${MPI_CXX_LINK_FLAGS})
+target_include_directories(ctest_inputv PUBLIC "${PROJECT_SOURCE_DIR}/")
+
+target_include_directories(bcast_mt PRIVATE ${MPI_C_INCLUDE_PATH})
+target_compile_options(bcast_mt PRIVATE ${MPI_C_COMPILE_FLAGS})
+target_link_libraries(bcast_mt PRIVATE ${MPI_C_LIBRARIES} ${MPI_CXX_LINK_FLAGS})
+target_include_directories(bcast_mt PUBLIC "${PROJECT_SOURCE_DIR}/")
+
+target_include_directories(bcast_reduce_mt PRIVATE ${MPI_C_INCLUDE_PATH})
+target_compile_options(bcast_reduce_mt PRIVATE ${MPI_C_COMPILE_FLAGS})
+target_link_libraries(bcast_reduce_mt PRIVATE ${MPI_C_LIBRARIES} ${MPI_CXX_LINK_FLAGS})
+target_include_directories(bcast_reduce_mt PUBLIC "${PROJECT_SOURCE_DIR}/")

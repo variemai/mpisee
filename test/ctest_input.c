@@ -7,7 +7,6 @@
 int main (int argc, char *argv[]){
     int i;
     MPI_Init(&argc, &argv);
-    getRunCmd(argc, argv);
     assert(ac > 0);
     for ( i =0; i<ac; i++ ){
         assert ( strcmp(av[i], argv[i]) == 0 );

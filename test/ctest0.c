@@ -7,7 +7,7 @@
 #include <assert.h>
 
 int main (int argc, char *argv[]){
-    int size,flag,rank;
+    int flag,rank;
     MPI_Comm splitcomm;
     prof_attrs *communicator = NULL;
     MPI_Init(NULL, NULL);

@@ -2268,7 +2268,7 @@ _Finalize()
         fprintf(fpp,"# Mapping:'");
         for ( i =0; i<size; i++ ){
             if ( ptr != NULL ){
-                snprintf(proc_name, MPI_MAX_PROCESSOR_NAME, ptr);
+                snprintf(proc_name, MPI_MAX_PROCESSOR_NAME, "%s", ptr);
             }
             if ( i != size-1 )
                 fprintf(fpp, "%d %s,",i,proc_name);
@@ -2307,7 +2307,7 @@ _Finalize()
                 msgs[j] = recv_buffer[i].msgs;
                 sizes[j] = recv_buffer[i].size;
                 if( p )
-                    fprintf(fpp, "%d,%s,%d,%ld,%ld,",r,names[j],sizes[j],bytes[j],msgs[j]);
+                    fprintf(fpp, "%d,%s,%d,%llu,%llu,",r,names[j],sizes[j],bytes[j],msgs[j]);
                 /* memcpy(&prims[j*NUM_OF_PRIMS],recv_buffer[i].prims,NUM_OF_PRIMS*sizeof(int)); */
                 for ( k =0; k<NUM_OF_PRIMS; k++){
                     prims[j*NUM_OF_PRIMS+k] = recv_buffer[i].prims[k];
