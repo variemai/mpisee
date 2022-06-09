@@ -68,3 +68,12 @@ profiles/*.R*
 .ccls-cache/
 CMakeFiles/
 build/
+
+.DS_Store
+*CMakeScripts/
+*.cmake
+*.xcodeproj/
+datastructlib/mpisee.build/
+mpisee.build/
+mpisee.xcodeproj/
+*Debug/
