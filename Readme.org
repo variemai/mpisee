@@ -5,7 +5,7 @@
 1. *communicator-centric*: profiling data are gathered per communicator
    - MPI calls per communicator: volume, time, number of calls
 2. communicator names
-   - distinct and associate between communicators
+   - distinguish and associate between communicators
 3. lightweight - adds minimal overhead to application executions
 4. can be linked with *LD_PRELOAD*
    - No recompilation of the application with /mpisee/ is required
@@ -15,3 +15,9 @@
 1. C compiler (gcc, clang)
 2. MPI library (OpenMPI, MPICH or other)
 3. Python 3  ( for /mpisee-through/ script )
+** Build
+- ~cmake -B build -S .~
+  - use ~DMPI_C_COMPILER=/path/to/mpicc~ if the MPI is not correctly detected
+** Usage
+- Profile: ~LD_PRELOAD=/path/to/libmpisee.so mpirun <mpi args> <exec> <args>~
+- Read output: ~python /path/to/mpisee-through.py -cct per_process_data.csv~

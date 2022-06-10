@@ -1,6 +1,11 @@
 #+title: Software Testing
+#+BIBLIOGRAPHY: bibliography plain
 
 * Introduction
+** The Software Under Test
+The SUT for this assignment is *mpisee*, a profiling tool for MPI applications written in C. The motivation for *mpisee* was to explore the use of MPI communicators. This was not possible with other state-of-the-art profiling tools since they disregard communicators. Originally, I have developed this tool for personal use but we decided that it can be published since it is a useful tool and a new idea. We published *mpisee* in the [[https://hips2022.github.io/][IPDPS 2022 HIPS workshop]].
+
+This tool is new (less than 9 months) and it's a work in progress, this means that some MPI calls are not supported, and it has not been tested thoroughly. Also, I am the only developer of *mpisee* it is tricky to be the tester, since I am biased. Therefore, I was thrilled when this guest lecture on Software Testing was offered. Testing *mpisee* presents a lot of challenges since it is a parallel program, although it is not as complicated as Object-oriented code it still poses many challenges.
 
 * Infrastructure
 * Testing
@@ -9,3 +14,8 @@
 - Call Bcast (or any rooted) with different root but with the same buffer size
 - Think of more metamorphic relations
 * Conclusion
+* Bibliography
+#+BEGIN_SRC latex
+\bibliographystyle{plain}
+\bibliography{biblio}
+#+END_SRC
