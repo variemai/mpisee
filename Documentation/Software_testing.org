@@ -1,0 +1,11 @@
+#+title: Software Testing
+
+* Introduction
+
+* Infrastructure
+* Testing
+** Setting the infrastructure
+** Metamorphic relations
+- Call Bcast (or any rooted) with different root but with the same buffer size
+- Think of more metamorphic relations
+* Conclusion
