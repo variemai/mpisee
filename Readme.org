@@ -1,7 +1,15 @@
 #+title: Readme
 
 * mpisee: profiling MPI applications for communication and communicator structure
-* Tests
+** Features
+1. *communicator-centric*: profiling data are gathered per communicator
+   - MPI calls per communicator: volume, time, number of calls
+2. communicator names
+   - distinct and associate between communicators
+3. lightweight profiling tool
+4. can be linked with *LD_PRELOAD*
+   - No recompilation of the application with /mpisee/ is required
+* Testing
 ** Metamorphic relations
 - Call Bcast (or any rooted) with different root but with the same buffer size
 - Think of more metamorphic relations
