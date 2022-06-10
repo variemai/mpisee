@@ -9,6 +9,12 @@
 3. lightweight profiling tool
 4. can be linked with *LD_PRELOAD*
    - No recompilation of the application with /mpisee/ is required
+5. Output in a single CSV file
+6. /mpisee-through/ script reads the csv output and prints some quick data
+** Requirements
+1. C compiler (gcc, clang)
+2. MPI library (OpenMPI, MPICH or other)
+3. Python 3  ( for /mpisee-through/ script )
 * Testing
 ** Metamorphic relations
 - Call Bcast (or any rooted) with different root but with the same buffer size
