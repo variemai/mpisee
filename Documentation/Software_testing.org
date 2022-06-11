@@ -1,15 +1,19 @@
 #+title: Software Testing
 #+BIBLIOGRAPHY: bibliography plain
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:https://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+latex_header: \usepackage{listings} \usepackage{xcolor} \definecolor{mGreen}{rgb}{0,0.6,0} \definecolor{mGray}{rgb}{0.5,0.5,0.5} \definecolor{mPurple}{rgb}{0.58,0,0.82} \definecolor{backgroundColour}{rgb}{0.95,0.95,0.92} \lstdefinestyle{cstyle}{ backgroundcolor=\color{backgroundColour}, commentstyle=\color{mGreen}, keywordstyle=\color{magenta}, numberstyle=\tiny\color{mGray}, stringstyle=\color{mPurple}, basicstyle=\footnotesize, breakatwhitespace=false, breaklines=true, captionpos=b, keepspaces=true, numbers=left, numbersep=5pt, showspaces=false, showstringspaces=false,showtabs=false, tabsize=2,language=C }
 
 * Introduction
 ** The Software Under Test
 The SUT for this assignment is =mpisee=, a profiling tool for MPI applications written in C. The motivation for =mpisee= was to explore the use of MPI communicators. This was not possible with other state-of-the-art profiling tools since they disregard communicators. Originally, I have developed this tool for personal use but we decided that it can be published since it is a useful tool and a new idea. We published =mpisee= in the [[https://hips2022.github.io/][IPDPS 2022 HIPS workshop]].
-
 ** Testing the software
-=mpisee= is a new (less than 9 months) software and it's a work in progress, this means that some MPI calls are not supported, and it has not been tested thoroughly. Also, I am the only developer of =mpisee= it is tricky to be the tester, since I am biased. Therefore, I was thrilled when this guest lecture on Software Testing was offered. Testing =mpisee= presents a lot of challenges since it is a parallel program, although it is not as complicated as Object-oriented code it still poses many challenges.
+=mpisee= is a new (less than 9 months) software and it still is a work in progress. This means that some MPI calls are not supported, and it has not been tested thoroughly. Also, I am the only developer of =mpisee= it is tricky to be the tester, since I am biased. Therefore, I was thrilled when this guest lecture on Software Testing was offered. Testing =mpisee= presents a lot of challenges since it is a parallel program, although it is not as complicated as Object-oriented code it still poses some challenges.
 *** Challenges
 First, because it is a profiler, the input of =mpisee= can be any MPI application and these MPI applications have, additionally, different inputs on their own. This creates an infinite space of possible inputs for =mpisee=. Second, the profiler should be able to handle any number of processes or at least be aware of the maximum number of processes it can handle. Third, parallelism and the dependence on MPI library add another layer of complexity to testing such software.
-Besides the challenges due to the nature of MPI, parallelism and profiling I had to deal with other more technical issues. Some of the technical issues was to learn how to compile with CMake and use Ctest to automate the testing process. In other words, create an infrastructure that would automate the way to add new tests and run them.
+Besides the challenges due to the nature of MPI, parallelism and profiling I had to deal with other more technical issues. These technical issues was to learn how to compile with CMake and use Ctest to automate the testing process. In other words, create an infrastructure that would automate testing.
 *** Methods
 After our discussion with Prof Mariani, I have chosen to create Metamorphic Tests along with some basic functional and correctness tests since the input space is too large to be handled otherwise. I was glad to explore and create such tests and I was not aware of Metamorphic testing before discussing it in this course. Writing tests for =mpisee= is easier when being the developer of the software and knowing exactly its structure. Additionally, the simple code structure of =mpisee= allowed me to expose the necessary structures that were required for testing. More details on the actual testing are provided in the corresponding section.
 
@@ -21,13 +25,23 @@ The requirement for this CMake build is that it must work in every Linux cluster
 ** Ctests
 Using ctests automated the testing process from writing to running tests and checking their correctness. Learning to setup the infrastructure for ctests was a substantial part of this software testing project. The hardest part of setting this infrastructure for ctests is the peculiarity of MPI, an MPI program can only be run with the launcher ~mpirun~ or ~mpiexec~. Therefore, ctests must run with the corresponding launcher otherwise the will run with a single process. My goal is that anyone who gets =mpisee= can run these tests with a simple command such as ~ctest~. Another factor that should be considered is the number of processes that each test should run with. CMake provides some environment variables ~MPIEXEC, MPIEXEC_NUMPROC_FLAG, MPIEXEC_MAX_NUMPROCS~ that can be used to decide the launcher, the flag (which can be ~np~ or ~n~ depending on the launcher) and also the maximum number of processes for the system. The number of processes typically corresponds to the number of cores.
 
-After setting the infrastructure I was able to add tests, run and check them and of course fix bugs in my code where they appeared. Interestingly, I manage to build and run =mpisee= in both Linux and MacOS machines. I believe that this technical knowledge of CMake and ctests will be invaluable. Besides documentation I also followed this [[https://coderefinery.github.io/cmake-workshop/][CMake Workshop]] that helped me to create this infrastructure from scratch.
+After setting the infrastructure I was able to add tests, run and check them and of course fix bugs in my code where they appeared. Interestingly, I managed to build and run =mpisee= in both Linux and MacOS machines. I believe that this technical knowledge of CMake and ctests will be invaluable to me. Besides documentation I also followed this [[https://coderefinery.github.io/cmake-workshop/][CMake Workshop]] that helped me to create this infrastructure from scratch.
 
 * Testing
-After discussing the SUT with Prof. Mariani he advised me to use Metamorphic Testing for testing it. Metamorphic testing can be used for both test case generation and verification \cite{10.1145/3143561}. This was extremely interesting to me and it actually simplified the testing of parallel code, as =mpisee=.
+After discussing the SUT with Prof. Mariani he advised me to use Metamorphic Testing (MT). MT can be used for both test case generation and verification \cite{10.1145/3143561,8449651}. Additionally, MT can effectively address the oracle problem \cite{8449651}. Therefore it seems that MT is a powerful testing approach and it actually simplified the testing of parallel code, as =mpisee=. Although students find MT counter-intuitive \cite{introductiontosoftwaretesting}, I found it actually suits this project very well because profiling allows computation on given input to be related on the same computation on another input\cite{introductiontosoftwaretesting}.
+
 ** Metamorphic relations
-- Call Bcast (or any rooted) with different root but with the same buffer size
-- Think of more metamorphic relations
+To perform MT, I needed to identify some /metamorphic relations/ (MRs), MRs are properties of the target function in relation to multiple inputs and their expected outputs \cite{10.1145/3143561}. Finding such relations with an MPI profiling tool are straightforward. Consider the following example:
+#+begin_src latex
+\begin{lstlisting}[style=cstyle]
+//int MPI_Bcast( void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm )
+MPI_Bcast(&buff, 1, MPI_DOUBLE, 0, comm0);
+MPI_Bcast(&buff, 2, MPI_INT, 0, comm1);
+assert(comm1->prims[bytes]== comm0->prims[bytes]);
+\end{lstlisting}
+#+end_src
+In the comment above we see the ~MPI_Bcast~ function's prototype.
+For he two invocations of ~MPI_Bcast~ =mpisee= must record the same number of bytes. In general if ~count*sizeof(datatype)~ are equal between two calls the number of bytes recorded by ==mpisee= must be equal. Also these two calls use a different communicator. The MR is shown in line 4 with the call of assert, where the bytes transferred by both calls must be equal.
 * Conclusion
 * Bibliography
 #+BEGIN_SRC latex
