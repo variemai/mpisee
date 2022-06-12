@@ -43,6 +43,18 @@ assert(comm1->prims[Bcast] == comm0->prims[Bcast]);
 #+end_src
 In the comment above we see the ~MPI_Bcast~ function's prototype.
 For he two invocations of ~MPI_Bcast~, =mpisee= must record the same number of bytes. In general if ~count*sizeof(datatype)~ are equal between two calls the number of bytes recorded by =mpisee= must be equal. Also these two calls use a different communicator, ~comm0~ and ~comm1~.  The MR is checked in line 4 with the call of ~assert~. In line 4 the bytes of ~MPI_Bcast~ in communicators ~comm0~ and ~comm1~ are compared. Another metamorphic relation that is the number of calls per communicator. The number of calls for ~MPI_Bcast~ in each communicator is independent to the arguments of each call. Therefore, in the above example line 5 compares the number of calls of ~MPI_Bcast~ in both communicators and it must always be equal.
+
+The above metamorphic relation can be used for different MPI functions. For example, comparing the number of bytes for ~MPI_Bcast~ and ~MPI_Reduce~. Again, if the same conditions are true then the number of bytes must be the same for all processes except the root. Creating MRs between different functions is more complicated especially if they are collective calls. The following relation between different MPI collectives can be identified, if ~count*sizeof(datatype)~ is equal:
+
+#+begin_src latex
+\begin{lstlisting}[style=cstyle]
+prims_bytes[Reduce] == prims_bytes[Gather] == prims_bytes[Scatter] == prims_bytes[Allreduce] == prims_bytes[Allgather]
+\end{lstlisting}
+#+end_src
+
+*** Metamorphic relations for communicator names
+We discussed metamorphic relations for communication functions, meaning functions that transfer data between the processes. Another category of functions are the communicator creation functions, functions that create communicators by partitioning the processes.
+The main feature of =mpisee= is the communicator naming scheme, each process can assign names to the communicators it is part of. These names must be consistent across all processes, therefore, processes that belong to the same communicator must name it the same. Likewise, these names must be different when they refer to different communicators.
 * Conclusion
 * Bibliography
 #+BEGIN_SRC latex
