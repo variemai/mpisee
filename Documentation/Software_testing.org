@@ -61,7 +61,13 @@ Testing the unique names is as simple as shown below (in C we need a string comp
 ~communicator0->name != communicator1->name~
 
 However, testing that names are consistent across all processes requires that processes gather the communicator names from other processes and compare them. Such relations are demonstrated in test file =comm_create.c= with the calls to ~MPI_Comm_create~.
+
+** Non-metamorphic tests
+=mpisee= copies the input arguments of the application and reports them in the end. To check if these copies are correct I have created two tests. There are not metamorphic tests. The first test runs with a fixed input and the second one generates a vector of random arguments. These tests actually helped me to solve a problem with incorrect copies of arguments.
 * Conclusion
+Employing MT to test =mpisee= was a really educational experience. From creating the infrastructure to actually thinking and implementing the tests. Also, I had the opportunity to fix bugs in my code that were found by testing.
+
+It should be mentioned that =mpisee= is far from complete as well as its testing. A fundamental problem that I am not sure how to solve is how to test if timing stats are correct. In this assignment, I have shown how I tested the correctness of number of bytes and number calls, however, =mpisee= also measures the time for each call. I am not sure if I MRs between timing measurements can be found, therefore this aspect of =mpisee= is not tested. Furthermore, there are important functions that need further testing in multinode systems. Thus, some kind of stress tests can also be useful.
 * Bibliography
 #+BEGIN_SRC latex
 \bibliographystyle{plain}

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <time.h>
 #include "../utils.h"
 
 int random_int(int lower, int upper)
@@ -17,7 +18,7 @@ int main (int argc, char *argv[]){
     char **aav = NULL;
     aac = random_int(1,MAX_ARGS);
     aav = (char**) malloc ( sizeof (char*)*aac);
-    srand(7777);
+    srand(time(NULL));
     for( i =0; i<aac; i++){
         aav[i] = (char*) malloc ( sizeof(char)*MAX_ARG_SIZE);
         len = random_int(0,MAX_ARG_SIZE-1);
