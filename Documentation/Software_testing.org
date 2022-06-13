@@ -1,6 +1,6 @@
 #+title: Software Testing Report
 #+BIBLIOGRAPHY: bibliography plain
-#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc ^:nil
 #+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:https://orgmode.org/org-info.js
 #+EXPORT_SELECT_TAGS: export
 #+EXPORT_EXCLUDE_TAGS: noexport
@@ -29,6 +29,7 @@ After setting the infrastructure I was able to add tests, run and check them and
 
 * Testing
 After discussing the SUT with Prof. Mariani he advised me to use Metamorphic Testing (MT). MT can be used for both test case generation and verification \cite{10.1145/3143561,8449651}. Additionally, MT can effectively address the oracle problem \cite{8449651}. Therefore it seems that MT is a powerful testing approach and it actually simplified the testing of parallel code, as =mpisee=. Although students find MT counter-intuitive \cite{introductiontosoftwaretesting}, I found it actually suits this project very well because profiling allows computation on given input to be related on the same computation on another input\cite{introductiontosoftwaretesting}.
+All test files are found in the test folder.
 
 ** Metamorphic relations
 To perform MT, I needed to identify some /metamorphic relations/ (MRs), MRs are properties of the target function in relation to multiple inputs and their expected outputs \cite{10.1145/3143561}. Finding such relations with an MPI profiling tool are straightforward. Consider the following example:
@@ -44,17 +45,22 @@ assert(comm1->prims[Bcast] == comm0->prims[Bcast]);
 In the comment above we see the ~MPI_Bcast~ function's prototype.
 For he two invocations of ~MPI_Bcast~, =mpisee= must record the same number of bytes. In general if ~count*sizeof(datatype)~ are equal between two calls the number of bytes recorded by =mpisee= must be equal. Also these two calls use a different communicator, ~comm0~ and ~comm1~.  The MR is checked in line 4 with the call of ~assert~. In line 4 the bytes of ~MPI_Bcast~ in communicators ~comm0~ and ~comm1~ are compared. Another metamorphic relation that is the number of calls per communicator. The number of calls for ~MPI_Bcast~ in each communicator is independent to the arguments of each call. Therefore, in the above example line 5 compares the number of calls of ~MPI_Bcast~ in both communicators and it must always be equal.
 
-The above metamorphic relation can be used for different MPI functions. For example, comparing the number of bytes for ~MPI_Bcast~ and ~MPI_Reduce~. Again, if the same conditions are true then the number of bytes must be the same for all processes except the root. Creating MRs between different functions is more complicated especially if they are collective calls. The following relation between different MPI collectives can be identified, if ~count*sizeof(datatype)~ is equal:
+The above metamorphic relation can be used for different MPI functions. For example, comparing the number of bytes for ~MPI_Gather~ and ~MPI_Reduce~. Again, if the same conditions are true then the number of bytes must be the same for all processes except the root. Creating MRs between different functions is more complicated especially if they are collective calls. The following relation between different MPI collectives can be identified, if ~count*sizeof(datatype)~ is equal:
 
-#+begin_src latex
-\begin{lstlisting}[style=cstyle]
-prims_bytes[Reduce] == prims_bytes[Gather] == prims_bytes[Scatter] == prims_bytes[Allreduce] == prims_bytes[Allgather]
-\end{lstlisting}
-#+end_src
+~prims_bytes[Reduce] == prims_bytes[Gather] ==~
+
+~prims_bytes[Allgather] == prims_bytes[Allgather]~
+
+Such relations are demonstrated in test file =allg_rand_data.c=. Additionally, this test creates two random ~count~ and ~datasize~ but with equal product ~count*sizeof(datasize)~ and uses them to test the above metamorphic relations.
 
 *** Metamorphic relations for communicator names
 We discussed metamorphic relations for communication functions, meaning functions that transfer data between the processes. Another category of functions are the communicator creation functions, functions that create communicators by partitioning the processes.
-The main feature of =mpisee= is the communicator naming scheme, each process can assign names to the communicators it is part of. These names must be consistent across all processes, therefore, processes that belong to the same communicator must name it the same. Likewise, these names must be different when they refer to different communicators.
+The main feature of =mpisee= is the communicator naming scheme, each process can assign names to the communicators it is part of. These names must be consistent across all processes, therefore, processes that belong to the same communicator must name it the same. Likewise, these names must be different when they refer to different communicators. Therefore, these test check the communicator names per process to confirm that they are unique. Then, the names are also compared across processes to confirm that processes in the same communicator have named it in the same exact way.
+Testing the unique names is as simple as shown below (in C we need a string comparison function).
+
+~communicator0->name != communicator1->name~
+
+However, testing that names are consistent across all processes requires that processes gather the communicator names from other processes and compare them. Such relations are demonstrated in test file =comm_create.c= with the calls to ~MPI_Comm_create~.
 * Conclusion
 * Bibliography
 #+BEGIN_SRC latex
