@@ -21,3 +21,6 @@
 ** Usage
 - Profile: ~LD_PRELOAD=/path/to/libmpisee.so mpirun <mpi args> <exec> <args>~
 - Read output: ~python /path/to/mpisee-through.py -cct per_process_data.csv~
+** Software testing
+- [[./Documentation/Software_testing.pdf][Report]]
+- tests in "test" folder
