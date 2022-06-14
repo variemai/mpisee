@@ -9,6 +9,8 @@
 * Introduction
 ** The Software Under Test
 The SUT for this assignment is =mpisee=, a profiling tool for MPI applications written in C. The motivation for =mpisee= was to explore the use of MPI communicators. This was not possible with other state-of-the-art profiling tools since they disregard communicators. Originally, I developed this tool for personal use but we decided that it can be published since it is a novel profiling approach that might prove useful to others. We published =mpisee= in the [[https://hips2022.github.io/][IPDPS 2022 HIPS workshop]].
+
+The most common practice of MPI profilers is to wrap MPI functions and use the profiling interface of MPI, =PMPI=, to make the actual calls. Therefore, the profiler is able to inject code before and after the call of the MPI function. In this way profiling data such as the buffer size (bytes exchanged), the number of calls of this MPI function and the time can be gathered.
 ** Testing the software
 =mpisee= is a new (less than 9 months) software and it still is a work in progress. This means that some MPI calls are not supported, and it has not been tested thoroughly. Also, I am the only developer of =mpisee= it is tricky to be the tester, since I am biased. Therefore, I was thrilled when this guest lecture on Software Testing was offered. Testing =mpisee= presents a lot of challenges since it is a parallel program, although it is not as complicated as Object-oriented code it still poses some challenges.
 *** Challenges
