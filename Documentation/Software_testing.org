@@ -68,12 +68,14 @@ However, testing that names are consistent across all processes requires that pr
 
 ** Non-metamorphic tests
 =mpisee= copies the input arguments of the application and reports them in the end. To check if these copies are correct I have created two tests. There are not metamorphic tests. The first test runs with a fixed input and the second one generates a vector of random arguments. These tests actually helped me to solve a problem with incorrect copies of arguments.
+
+Another test that I have implemented is to check the correctness of ~MPI_Comm_free~. This function frees the communicator which means that the data stored in the communicator by =mpisee= have to copied before being freed. The last test checks the correctness of such data after a call to ~MPI_Comm_free~.
+
 * Conclusion
 It should be mentioned that =mpisee= is far from complete as well as its testing. A fundamental problem that I am not sure how to solve is how to test if timing stats are correct. In this assignment, I have shown how I tested the correctness of number of bytes and number calls, however, =mpisee= also measures the time for each call. I am not sure if I MRs between timing measurements can be found, therefore this aspect of =mpisee= is not tested. Additionally, I have not tested the ~MPI_Finalize~ function which actually collects the data in the end. Furthermore, there are important functions that need further testing in multinode systems with thousands of processes. Thus, a form of stress testing is also necessary in order to have a complete testing of this project.
 
-Employing MT to test =mpisee= was a really educational experience. From creating the infrastructure to actually thinking and implementing the tests. Also, I had the opportunity to fix bugs in my code that were found by testing. This software testing endeavor has granted me a better insight on how to practically test software and how useful it can be. The main takeaways of this project are the technical skills (CMake and ctests) and the knowledge of Metamorphic testing technique that I have used to test =mpisee=.
-
-* Bibliography
+Employing MT to test =mpisee= was a really educational experience. From creating the infrastructure to actually thinking and implementing the tests. Also, I had the opportunity to fix bugs in my code that were found by testing. This software testing endeavor has granted me a better insight on how to practically test software and how useful it can be. The main takeaways of this project are the technical skills (CMake and ctests) and the Metamorphic testing technique that I have used to test =mpisee=. Finally, I have read and understood more about software testing, I also found some interesting [[https://buildtest.readthedocs.io/en/devel/index.html][automation tools for testing software in cluster environments]] which might be useful in the future.
+\newpage
 #+BEGIN_SRC latex
 \bibliographystyle{plain}
 \bibliography{biblio}
