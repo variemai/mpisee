@@ -2265,7 +2265,7 @@ _Finalize()
             tmp++;
         }
         fprintf(fpp, "'\n");
-        fprintf(fpp,"# Mapping:'");
+        fprintf(fpp,"#'Mapping: ");
         for ( i =0; i<size; i++ ){
             if ( ptr != NULL ){
                 snprintf(proc_name, MPI_MAX_PROCESSOR_NAME, "%s", ptr);
