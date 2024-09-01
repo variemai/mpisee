@@ -1,0 +1,75 @@
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        mpi_implementation: [mpich,openmpi]
+        #build_type: [Release]
+        include:
+          - mpi_implementation: openmpi
+            c_compiler: gcc
+            cpp_compiler: g++
+            mpi_c_compiler: mpicc
+            mpi_cxx_compiler: mpicxx
+          - mpi_implementation: mpich
+            c_compiler: mpicc
+            cpp_compiler: mpicxx
+            mpi_c_compiler: mpicc
+            mpi_cxx_compiler: mpicxx
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y make build-essential wget tar g++ libpmix2
+
+    - name: Install MPI (Either OpenMPI or MPICH)
+      env:
+        OPENMPI_VERSION: 4.1.2
+        MPICH_VERSION: 4.0.3
+      run: |
+        if [ "${{ matrix.mpi_implementation }}" == "openmpi" ]; then
+          sudo apt install -y libopenmpi-dev
+        else
+          sudo apt install -y libmpich-dev mpich
+        fi
+        sudo ldconfig
+        
+    - name: Set Reusable Strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build-${{ matrix.mpi_implementation }}" >> "$GITHUB_OUTPUT"
+        echo "mpi-bin-dir=/usr/local/bin" >> "$GITHUB_OUTPUT"
+
+
+    - name: Configure CMake
+      shell: bash
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DMPI_CXX_COMPILER=${{ matrix.mpi_cxx_compiler}}
+        -DMPI_C_COMPILER=${{ matrix.mpi_c_compiler }}
+        -S ${{ github.workspace }}
+
+    - name: Build
+      shell: bash
+      #env: 
+      #  PATH: ${{ steps.strings.outputs.mpi-bin-dir }}:$PATH # Add MPI to PATH
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} #--config ${{ matrix.build_type }}
+        
+    - name: Test 
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: ctest --output-on-failure -j2 -VV
