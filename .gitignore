@@ -76,3 +76,4 @@ build/
 build_*
 build
 cmake-build-debug/
+.github/
