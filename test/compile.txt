@@ -1,0 +1,1 @@
+mpicc -L/home/vardas/repos/communicator_profiler/lib  hello_mpi.c -lmcpt

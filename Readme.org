@@ -1,0 +1,93 @@
+#+title: Readme
+* Introduction
+=mpisee= is a lightweight MPI profiler focusing on communicators. It can reveal communication bottlenecks and uncover hidden patterns within MPI communicators. Its output is an SQL database which can be queried for information using a python tool, =mpisee-through=.
+#+attr_html: :width 100%
+[[./images/See.jpg]]
+* Build
+** Dependencies
+1. C/C++ compiler that supports C++11 standard
+2. CMake version > 3.10
+3. MPI Library (Open MPI, MPICH, CrayMPICH, MVAPICH, IntelMPI)
+4. SQLite library
+** Basic build
+#+begin_src bash
+git clone https://github.com/variemai/communicator_profiler.git && cd communicator_profiler
+mkdir build && cd build
+cmake -DCMAKE_INSTALL_PREFIX=/path/to/install .. && make -j && make install
+#+end_src
+- ~make install~ will place =libmpisee.so= in the ~lib~ folder of the installation path and ~mpisee-through.py~ to ~bin~.
+- You might need to define the compiler if it is not detected e.g., ~-DMPI_CXX_COMPILER=mpicxx~.
+* Usage
+- To profile your MPI application make sure it is compiled with the same MPI library as mpisee.
+- Set ~LD_PRELOAD~ and ~MPISEE_OUTFILE~ variables before running your application.
+- ~LD_PRELOAD~ to point to the ~libmpisee.so~ created in the build folder.
+- ~MPISEE_OUTFILE~ defines output file name.
+- The default output file name is "mpisee_" followed by date and time (e.g., mpisee_20240516143015.db).
+- To get a summary of the results parse the output file with the ~mpisee-through.py~.
+  - For a complete list of options run ~/path/to/install/bin/mpisee-through.py --help~.
+** Example Usage
+#+begin_src bash
+LD_PRELOAD=/path/to/install/lib/libmpisee.so MPISEE_OUTFILE=/path/to/output.db <mpi launcher> <args> /path/to/exec <args>
+/path/to/install/bin/mpisee-through.py -i /path/to/mpisee_profile.db
+#+end_src
+
+** Results analysis with mpisee-through
+- The default query displays all data in each communicator by summarizing across ranks:
+  #+begin_src bash
+  mpisee-through.py -i /path/to/mpisee_profile.db
+  #+end_src
+
+- Display all data by separating ranks:
+  #+begin_src bash
+  mpisee-through.py -i /path/to/mpisee_profile.db -a
+  #+end_src
+
+- Display data for collective MPI operations only:
+  #+begin_src bash
+  mpisee-through.py -i /path/to/mpisee_profile.db -c
+  #+end_src
+
+- Display data for point-to-point MPI operations only:
+  #+begin_src bash
+  mpisee-through.py -i /path/to/mpisee_profile.db -p
+  #+end_src
+
+- The following switches can be combined with the above options:
+  - Display data for specific MPI ranks, e.g., Ranks 0 and 12: ~-r 0,12~.
+  - Display data for a specific buffer range, e.g., 0-1024: ~-b 0:1024~.
+  - Display data for MPI operations within a specific time range, e.g, from 0.02 to 0.8 seconds: ~-t 0.02:0.8~.
+- Use ~-h~ switch for a complete list of commands.
+
+*Check the [[../../wiki/Interpreting-The-output-of-mpisee%E2%80%90through][wiki]] for a detailed example of how to interpret the output*
+* Advanced Build
+=mpisee= uses buffer size ranges to categorize the MPI communication calls.
+These buffer size categories can be configured by the user for finer grain analysis. The default values are:
+~-NUM_BUCKETS=8~ and ~-BUCKETS=128,1024,8192,65536,262144,1048576,33554432~.
+| Buffer Range | Bucket |
+|--------------+--------|
+| 0-128        | 128    |
+| 128-1024     | 1024   |
+| ...          | ...    |
+
+** Configure Buffer Range Sizes (Buckets)
+- Set the ~NUM_BUCKETS~ and ~BUCKETS~ correctly: length of ~BUCKETS~ must be equal to ~NUM_BUCKETS-1~
+- Sample build with 9 Buckets:
+#+begin_src bash
+cmake -DNUM_BUCKETS=9 -DBUCKETS="64,512,4096,8192,65536,262144,1048576,33554432"
+#+end_src
+
+* Cite
+If you found this useful please cite:
+[[https://ieeexplore.ieee.org/document/9835659][Link to IEEE Xplore]]
+** Bibtex
+#+begin_src bibtex
+@INPROCEEDINGS{mpisee,
+  author={Vardas, Ioannis and Hunold, Sascha and Ajanohoun, Jordy I. and Träff, Jesper Larsson},
+  booktitle={2022 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW)},
+  title={mpisee: MPI Profiling for Communication and Communicator Structure},
+  year={2022},
+  volume={},
+  number={},
+  pages={520-529},
+  doi={10.1109/IPDPSW55747.2022.00092}}
+#+end_src
