@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(mpisee VERSION 3.3 DESCRIPTION "mpisee: A communicator-centric profiler")
+project(mpisee VERSION 4.0 DESCRIPTION "mpisee: A communicator-centric profiler" LANGUAGES CXX Fortran)
 
 find_package(MPI)
 if(NOT MPI_FOUND)
@@ -12,7 +12,7 @@ endif()
 
 
 set(CMAKE_CXX_COMPILER mpicxx)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g -Wall")
 # Set default values
 set(NUM_BUCKETS 8 CACHE STRING "Number of buckets")
 set(BUCKETS "128,1024,8192,65536,262144,1048576,33554432" CACHE STRING "Message size buckets in bytes")
@@ -46,7 +46,10 @@ configure_file(utils.h.in ${CMAKE_SOURCE_DIR}/utils.h)
 message(STATUS "Generated utils.h in ${CMAKE_SOURCE_DIR}")
 
 
-add_library(mpisee SHARED commprof.cpp pt2pt_wrappers.cpp collectives_wrappers.cpp neighbor_wrappers.cpp onesided_wrappers.cpp utils.cpp create_db.cpp)
+add_library(mpisee SHARED
+    commprof.cpp pt2pt_wrappers.cpp collectives_wrappers.cpp neighbor_wrappers.cpp onesided_wrappers.cpp utils.cpp create_db.cpp
+    mpisee_fortran.cpp mpisee_fortran_init.f90  # New files
+)
 #target_include_directories(create_db PRIVATE ${MPI_CXX_INCLUDE_DIRS})
 #target_link_libraries(create_db PRIVATE ${MPI_CXX_LIBRARIES})
 target_include_directories(mpisee PRIVATE ${MPI_CXX_INCLUDE_DIRS})

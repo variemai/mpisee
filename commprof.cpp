@@ -23,6 +23,7 @@
 #include "utils.h.in"
 #include <iostream>
 #include <chrono>
+#include "mpisee_fortran.h"
 
 // int global_rank; // For debugging purposes
 int prof_enabled = 1;
@@ -389,6 +390,7 @@ F77_MPI_INIT_THREAD (int *required, int *provided, int *ierr)
     getProcCmdLine (&ac, av);
     tmp = av;
     ret = _MPI_Init_thread(&ac, (char***)&tmp , *required, provided);
+    mpisee_fortran_in_place_init();
     *ierr = ret;
     return;
 }
@@ -414,6 +416,7 @@ F77_MPI_INIT (int *ierr)
   getProcCmdLine (&ac, av);
   tmp = av;
   ret = _MPI_Init (&ac, (char ***) &tmp);
+  mpisee_fortran_in_place_init();
   *ierr = ret;
   return;
 }

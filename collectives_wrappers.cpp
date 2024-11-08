@@ -1,6 +1,7 @@
 #include "commprof.h"
 #include "symbols.h"
 #include <mpi.h>
+#include "mpisee_fortran.h"
 
 int
 MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root,
@@ -113,8 +114,14 @@ F77_MPI_ALLREDUCE(const void  *sendbuf, void  *recvbuf, int  * count,
     c_datatype = MPI_Type_f2c(*datatype);
     c_op = MPI_Op_f2c(*op);
     c_comm = MPI_Comm_f2c(*comm);
+    //mpisee_fortran_in_place_init_();
+    printf("mpisee: mpisee_fortran_mpi_in_place = %p, sendbuf = %p\n",mpisee_fortran_mpi_in_place,sendbuf);
+    fflush(stdout);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Allreduce(MPI_IN_PLACE, recvbuf, *count, c_datatype, c_op, c_comm);
+    else
+        ret = MPI_Allreduce(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm);
 
-    ret = MPI_Allreduce(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm);
     *ierr =ret;
     return;
 }
