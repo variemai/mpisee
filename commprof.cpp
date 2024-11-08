@@ -301,8 +301,8 @@ _MPI_Init(int *argc, char ***argv){
     if ( rank == 0 ){
         appname = (char*)malloc(sizeof(char)*1024);
         appname = get_appname();
-        printf("MPI_Init: mpisee Profiling Tool\nProfiling application\
- %s\n",appname);
+        printf("MPI_Init: mpisee Profiling Tool version %d.%d\nProfiling application\
+ %s\n",MPISEE_MAJOR_VERSION,MPISEE_MINOR_VERSION,appname);
  #ifdef MPICH_NAME
         printf("MPICH library used\n");
  #endif
