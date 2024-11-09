@@ -12,7 +12,7 @@ endif()
 
 
 #set(CMAKE_CXX_COMPILER mpicxx)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall")
 # Set default values
 set(NUM_BUCKETS 8 CACHE STRING "Number of buckets")
 set(BUCKETS "128,1024,8192,65536,262144,1048576,33554432" CACHE STRING "Message size buckets in bytes")
