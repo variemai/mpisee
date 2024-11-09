@@ -20,11 +20,13 @@ jobs:
             cpp_compiler: g++
             mpi_c_compiler: mpicc
             mpi_cxx_compiler: mpicxx
+            fortran_compiler: mpif90
           - mpi_implementation: mpich
             c_compiler: mpicc
             cpp_compiler: mpicxx
             mpi_c_compiler: mpicc
             mpi_cxx_compiler: mpicxx
+            fortran_compiler: mpif90
 
     steps:
     - uses: actions/checkout@v4
@@ -62,6 +64,7 @@ jobs:
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DMPI_CXX_COMPILER=${{ matrix.mpi_cxx_compiler}}
         -DMPI_C_COMPILER=${{ matrix.mpi_c_compiler }}
+        -DCMAKE_Fortran_COMPILER=${{ matrix.fortran_compiler}}
         -S ${{ github.workspace }}
 
     - name: Build
