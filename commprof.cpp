@@ -23,6 +23,7 @@
 #include "utils.h.in"
 #include <iostream>
 #include <chrono>
+#include "mpisee_fortran.h"
 
 // int global_rank; // For debugging purposes
 int prof_enabled = 1;
@@ -300,8 +301,8 @@ _MPI_Init(int *argc, char ***argv){
     if ( rank == 0 ){
         appname = (char*)malloc(sizeof(char)*1024);
         appname = get_appname();
-        printf("MPI_Init: mpisee Profiling Tool\nProfiling application\
- %s\n",appname);
+        printf("MPI_Init: mpisee Profiling Tool version %d.%d\nProfiling application\
+ %s\n",MPISEE_MAJOR_VERSION,MPISEE_MINOR_VERSION,appname);
  #ifdef MPICH_NAME
         printf("MPICH library used\n");
  #endif
@@ -389,6 +390,7 @@ F77_MPI_INIT_THREAD (int *required, int *provided, int *ierr)
     getProcCmdLine (&ac, av);
     tmp = av;
     ret = _MPI_Init_thread(&ac, (char***)&tmp , *required, provided);
+    mpisee_fortran_in_place_init();
     *ierr = ret;
     return;
 }
@@ -414,6 +416,7 @@ F77_MPI_INIT (int *ierr)
   getProcCmdLine (&ac, av);
   tmp = av;
   ret = _MPI_Init (&ac, (char ***) &tmp);
+  mpisee_fortran_in_place_init();
   *ierr = ret;
   return;
 }

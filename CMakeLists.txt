@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(mpisee VERSION 3.3 DESCRIPTION "mpisee: A communicator-centric profiler")
+project(mpisee VERSION 4.0 DESCRIPTION "mpisee: A communicator-centric profiler" LANGUAGES CXX Fortran)
 
 find_package(MPI)
 if(NOT MPI_FOUND)
@@ -11,7 +11,7 @@ if(NOT SQLite3_FOUND)
 endif()
 
 
-set(CMAKE_CXX_COMPILER mpicxx)
+#set(CMAKE_CXX_COMPILER mpicxx)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall")
 # Set default values
 set(NUM_BUCKETS 8 CACHE STRING "Number of buckets")
@@ -46,7 +46,10 @@ configure_file(utils.h.in ${CMAKE_SOURCE_DIR}/utils.h)
 message(STATUS "Generated utils.h in ${CMAKE_SOURCE_DIR}")
 
 
-add_library(mpisee SHARED commprof.cpp pt2pt_wrappers.cpp collectives_wrappers.cpp neighbor_wrappers.cpp onesided_wrappers.cpp utils.cpp create_db.cpp)
+add_library(mpisee SHARED
+    commprof.cpp pt2pt_wrappers.cpp collectives_wrappers.cpp neighbor_wrappers.cpp onesided_wrappers.cpp utils.cpp create_db.cpp
+    mpisee_fortran.cpp mpisee_fortran_init.f90  # New files
+)
 #target_include_directories(create_db PRIVATE ${MPI_CXX_INCLUDE_DIRS})
 #target_link_libraries(create_db PRIVATE ${MPI_CXX_LIBRARIES})
 target_include_directories(mpisee PRIVATE ${MPI_CXX_INCLUDE_DIRS})
@@ -74,7 +77,13 @@ if(SRUN_EXEC)
     set(MPIEXEC "${SRUN_EXEC}")
     message(STATUS "Found srun: ${SRUN_EXEC}")
 else()
-    message(STATUS "srun not found, using default MPIEXEC")
+    message(STATUS "srun not found, trying MPIEXEC")
+    find_program(MPIEXEC mpirun)
+    if (MPIEXEC)
+        message(STATUS "MPIEXEC found at: ${MPIEXEC}")
+    else()
+        message(FATAL_ERROR "MPIEXEC not found. Please install MPI and set MPIEXEC to the MPI launcher")
+    endif ()
 endif()
 
 # Installation
