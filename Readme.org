@@ -11,11 +11,12 @@
 4. SQLite library
 ** Basic build
 #+begin_src bash
-git clone https://github.com/variemai/communicator_profiler.git && cd communicator_profiler
-mkdir build && cd build
-cmake -DCMAKE_INSTALL_PREFIX=/path/to/install .. && make -j && make install
+git clone https://github.com/variemai/mpisee.git && cd mpisee
+cmake -S . -B build -DCMAKE_Fortran_COMPILER=mpif90 -DCMAKE_INSTALL_PREFIX=/path/to/install && \
+cmake --build build -j4 && \
+cmake --install build
 #+end_src
-- ~make install~ will place =libmpisee.so= in the ~lib~ folder of the installation path and ~mpisee-through.py~ to ~bin~.
+- ~cmake --install build~ will place =libmpisee.so= in the ~lib~ folder of the installation path and ~mpisee-through.py~ to ~bin~.
 - You might need to define the compiler if it is not detected e.g., ~-DMPI_CXX_COMPILER=mpicxx~.
 * Usage
 - To profile your MPI application make sure it is compiled with the same MPI library as mpisee.
