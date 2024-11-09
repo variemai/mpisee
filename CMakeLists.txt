@@ -11,7 +11,7 @@ if(NOT SQLite3_FOUND)
 endif()
 
 
-set(CMAKE_CXX_COMPILER mpicxx)
+#set(CMAKE_CXX_COMPILER mpicxx)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g -Wall")
 # Set default values
 set(NUM_BUCKETS 8 CACHE STRING "Number of buckets")
@@ -77,7 +77,13 @@ if(SRUN_EXEC)
     set(MPIEXEC "${SRUN_EXEC}")
     message(STATUS "Found srun: ${SRUN_EXEC}")
 else()
-    message(STATUS "srun not found, using default MPIEXEC")
+    message(STATUS "srun not found, trying MPIEXEC")
+    find_program(MPIEXEC mpirun)
+    if (MPIEXEC)
+        message(STATUS "MPIEXEC found at: ${MPIEXEC}")
+    else()
+        message(FATAL_ERROR "MPIEXEC not found. Please install MPI and set MPIEXEC to the MPI launcher")
+    endif ()
 endif()
 
 # Installation

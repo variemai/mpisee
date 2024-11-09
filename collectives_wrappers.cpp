@@ -114,9 +114,6 @@ F77_MPI_ALLREDUCE(const void  *sendbuf, void  *recvbuf, int  * count,
     c_datatype = MPI_Type_f2c(*datatype);
     c_op = MPI_Op_f2c(*op);
     c_comm = MPI_Comm_f2c(*comm);
-    //mpisee_fortran_in_place_init_();
-    //printf("mpisee: mpisee_fortran_mpi_in_place = %p, sendbuf = %p\n",mpisee_fortran_mpi_in_place,sendbuf);
-    //fflush(stdout);
     if ( sendbuf == mpisee_fortran_mpi_in_place)
         ret = MPI_Allreduce(MPI_IN_PLACE, recvbuf, *count, c_datatype, c_op, c_comm);
     else
@@ -646,7 +643,11 @@ F77_MPI_ALLGATHERV(const void  *sendbuf, int  * sendcount, MPI_Fint  * sendtype,
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Allgatherv(sendbuf, *sendcount, c_sendtype, recvbuf, recvcounts, displs, c_recvtype, c_comm);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Allgatherv(MPI_IN_PLACE, *sendcount, c_sendtype, recvbuf, recvcounts, displs, c_recvtype, c_comm);
+    else
+        ret = MPI_Allgatherv(sendbuf, *sendcount, c_sendtype, recvbuf, recvcounts, displs, c_recvtype, c_comm);
+
     *ierr = ret;
     return;
 }
@@ -744,7 +745,12 @@ F77_MPI_REDUCE(const void  *sendbuf, void  *recvbuf, int  * count,
     c_op = MPI_Op_f2c(*op);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Reduce(sendbuf, recvbuf, *count, c_datatype, c_op, *root, c_comm);
+
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Reduce(MPI_IN_PLACE, recvbuf, *count, c_datatype, c_op, *root, c_comm);
+    else
+        ret = MPI_Reduce(sendbuf, recvbuf, *count, c_datatype, c_op, *root, c_comm);
+
     *ierr = ret;
     return;
 
