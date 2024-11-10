@@ -162,7 +162,11 @@ F77_MPI_IALLREDUCE(const void  *sendbuf, void  *recvbuf, int  * count,
     c_op = MPI_Op_f2c(*op);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Iallreduce(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm, &c_request);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Iallreduce(MPI_IN_PLACE, recvbuf, *count, c_datatype, c_op, c_comm, &c_request);
+    else
+        ret = MPI_Iallreduce(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm, &c_request);
+
 
     *ierr = ret;
     if ( ret == MPI_SUCCESS )
@@ -257,8 +261,11 @@ F77_MPI_IALLGATHER(const void *sendbuf, int  * sendcount, MPI_Fint  * sendtype,
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Iallgather(sendbuf, *sendcount, c_sendtype, recvbuf, *recvcount,
-                         c_recvtype, c_comm, &c_request);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Iallgather(MPI_IN_PLACE, *sendcount, c_sendtype, recvbuf, *recvcount, c_recvtype, c_comm, &c_request);
+    else
+        ret = MPI_Iallgather(sendbuf, *sendcount, c_sendtype, recvbuf, *recvcount, c_recvtype, c_comm, &c_request);
+
     *ierr = ret;
     if ( ret == MPI_SUCCESS )
         *request = MPI_Request_c2f(c_request);
@@ -305,7 +312,12 @@ F77_MPI_ALLTOALL(const void  *sendbuf, int  * sendcount, MPI_Fint  * sendtype,
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Alltoall(sendbuf, *sendcount, c_sendtype, recvbuf, *recvcnt, c_recvtype, c_comm);
+    // All processes must use MPI_IN_PLACE
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Alltoall(MPI_IN_PLACE, *sendcount, c_sendtype, recvbuf, *recvcnt, c_recvtype, c_comm);
+    else
+        ret = MPI_Alltoall(sendbuf, *sendcount, c_sendtype, recvbuf, *recvcnt, c_recvtype, c_comm);
+
     *ierr = ret;
     return;
 }
@@ -350,7 +362,11 @@ F77_MPI_IALLTOALL(const void *sendbuf, int *sendcount, MPI_Fint *sendtype,
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Ialltoall(sendbuf, *sendcount, c_sendtype, recvbuf,
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Ialltoall(MPI_IN_PLACE, *sendcount, c_sendtype, recvbuf,
+                            *recvcount, c_recvtype, c_comm, &c_request);
+    else
+        ret = MPI_Ialltoall(sendbuf, *sendcount, c_sendtype, recvbuf,
                         *recvcount, c_recvtype, c_comm, &c_request);
     *ierr = ret;
     if ( ret == MPI_SUCCESS )
@@ -408,8 +424,14 @@ F77_MPI_ALLTOALLV(const void  *sendbuf, const int  *sendcnts, const int  *sdispl
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Alltoallv(sendbuf, sendcnts, sdispls, c_sendtype, recvbuf,
-                        recvcnts, rdispls, c_recvtype, c_comm);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Alltoallv(MPI_IN_PLACE, sendcnts, sdispls, c_sendtype, recvbuf,
+                            recvcnts, rdispls, c_recvtype, c_comm);
+    else
+        ret = MPI_Alltoallv(sendbuf, sendcnts, sdispls, c_sendtype, recvbuf,
+                            recvcnts, rdispls, c_recvtype, c_comm);
+
+
     *ierr = ret;
 }
 }
@@ -462,7 +484,11 @@ F77_MPI_IALLTOALLV(const void *sendbuf, const int *sendcnts, const int *sdispls,
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Ialltoallv(sendbuf, sendcnts, sdispls, c_sendtype, recvbuf,
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Ialltoallv(MPI_IN_PLACE, sendcnts, sdispls, c_sendtype, recvbuf,
+                             recvcnts, rdispls, c_recvtype, c_comm, &c_request);
+    else
+        ret = MPI_Ialltoallv(sendbuf, sendcnts, sdispls, c_sendtype, recvbuf,
                          recvcnts, rdispls, c_recvtype, c_comm, &c_request);
     *ierr = ret;
     if ( ret == MPI_SUCCESS )
@@ -524,8 +550,11 @@ void F77_MPI_ALLTOALLW(const void *sendbuf, const int *sendcnts, const int *sdis
         c_recvtypes[i] = MPI_Type_f2c(recvtypes[i]);
     }
 
-
-    ret = MPI_Alltoallw(sendbuf, sendcnts, sdispls, c_sendtypes, recvbuf,
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Alltoallw(MPI_IN_PLACE, sendcnts, sdispls, c_sendtypes, recvbuf,
+                            recvcnts, rdispls, c_recvtypes, c_comm);
+    else
+        ret = MPI_Alltoallw(sendbuf, sendcnts, sdispls, c_sendtypes, recvbuf,
                         recvcnts, rdispls, c_recvtypes, c_comm);
     *ierr = ret;
     return;
@@ -588,8 +617,13 @@ F77_MPI_IALLTOALLW(const void *sendbuf, const int *sendcnts, const int *sdispls,
         c_recvtypes[i] = MPI_Type_f2c(recvtypes[i]);
     }
 
-    ret = MPI_Ialltoallw(sendbuf, sendcnts, sdispls, c_sendtypes, recvbuf,
-                         recvcnts, rdispls, c_recvtypes, c_comm, &c_request);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Ialltoallw(MPI_IN_PLACE, sendcnts, sdispls, c_sendtypes, recvbuf,
+                            recvcnts, rdispls, c_recvtypes, c_comm, &c_request);
+    else
+        ret = MPI_Ialltoallw(sendbuf, sendcnts, sdispls, c_sendtypes, recvbuf,
+                        recvcnts, rdispls, c_recvtypes, c_comm, &c_request);
+
     *ierr = ret;
     if ( ret == MPI_SUCCESS )
         *request = MPI_Request_c2f(c_request);
@@ -700,7 +734,11 @@ F77_MPI_IALLGATHERV(const void *sendbuf, int *sendcount, MPI_Fint *sendtype,
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Iallgatherv(sendbuf, *sendcount, c_sendtype, recvbuf,
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Iallgatherv(MPI_IN_PLACE, *sendcount, c_sendtype, recvbuf,
+                              recvcounts, displs, c_recvtype, c_comm, &c_request);
+    else
+        ret = MPI_Iallgatherv(sendbuf, *sendcount, c_sendtype, recvbuf,
                           recvcounts, displs, c_recvtype, c_comm, &c_request);
     *ierr = ret;
     if ( ret == MPI_SUCCESS )
@@ -794,7 +832,11 @@ F77_MPI_IREDUCE(const void  *sendbuf, void  *recvbuf, int  * count,
     c_op = MPI_Op_f2c(*op);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Ireduce(sendbuf, recvbuf, *count, c_datatype, c_op, *root, c_comm, &c_request);
+    if (sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Ireduce(MPI_IN_PLACE, recvbuf, *count, c_datatype, c_op, *root, c_comm, &c_request);
+    else
+        ret = MPI_Ireduce(sendbuf, recvbuf, *count, c_datatype, c_op, *root, c_comm, &c_request);
+
     *ierr = ret;
     if ( ret == MPI_SUCCESS )
         *request = MPI_Request_c2f(c_request);
@@ -838,7 +880,12 @@ F77_MPI_GATHER(const void  *sendbuf, int  * sendcnt, MPI_Fint  * sendtype,
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Gather(sendbuf, *sendcnt, c_sendtype, recvbuf, *recvcount, c_recvtype, *root, c_comm);
+    // Only the root process can use MPI_IN_PLACE
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Gather(MPI_IN_PLACE, *sendcnt, c_sendtype, recvbuf, *recvcount, c_recvtype, *root, c_comm);
+    else
+        ret = MPI_Gather(sendbuf, *sendcnt, c_sendtype, recvbuf, *recvcount, c_recvtype, *root, c_comm);
+
     *ierr = ret;
     return;
 
@@ -883,7 +930,11 @@ void F77_MPI_IGATHER(const void  *sendbuf, int  * sendcnt, MPI_Fint  * sendtype,
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Igather(sendbuf, *sendcnt, c_sendtype, recvbuf, *recvcount, c_recvtype, *root, c_comm, &c_request);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Igather(MPI_IN_PLACE, *sendcnt, c_sendtype, recvbuf, *recvcount, c_recvtype, *root, c_comm, &c_request);
+    else
+        ret = MPI_Igather(sendbuf, *sendcnt, c_sendtype, recvbuf, *recvcount, c_recvtype, *root, c_comm, &c_request);
+
     *ierr = ret;
     if ( ret == MPI_SUCCESS )
         *request = MPI_Request_c2f(c_request);
@@ -943,7 +994,10 @@ F77_MPI_GATHERV(const void  *sendbuf, int* sendcount, MPI_Fint  * sendtype,
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Gatherv(sendbuf, *sendcount, c_sendtype, recvbuf, recvcounts,
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Gatherv(MPI_IN_PLACE, *sendcount, c_sendtype, recvbuf, recvcounts, displs, c_recvtype, *root, c_comm);
+    else
+        ret = MPI_Gatherv(sendbuf, *sendcount, c_sendtype, recvbuf, recvcounts,
                       displs, c_recvtype, *root, c_comm);
 
     *ierr = (MPI_Fint)ret;
@@ -1002,8 +1056,13 @@ F77_MPI_IGATHERV(const void  *sendbuf, int  * sendcount, MPI_Fint  * sendtype,
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Igatherv(sendbuf, *sendcount, c_sendtype, recvbuf, recvcounts, displs,
-                       c_recvtype, *root, c_comm, &c_request);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Igatherv(MPI_IN_PLACE, *sendcount, c_sendtype, recvbuf, recvcounts, displs,
+                           c_recvtype, *root, c_comm, &c_request);
+    else
+        ret = MPI_Igatherv(sendbuf, *sendcount, c_sendtype, recvbuf, recvcounts, displs,
+                           c_recvtype, *root, c_comm, &c_request);
+
     *ierr = (MPI_Fint)ret;
     if ( ret == MPI_SUCCESS )
         *request = MPI_Request_c2f(c_request);
@@ -1062,7 +1121,11 @@ F77_MPI_SCATTERV(const void  *sendbuf, const int  *sendcounts, const int  *displ
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Scatterv(sendbuf, sendcounts, displs, c_sendtype, recvbuf, *recvcount,
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Scatterv(MPI_IN_PLACE, sendcounts, displs, c_sendtype, recvbuf, *recvcount,
+                 c_recvtype, *root, c_comm);
+    else
+        ret = MPI_Scatterv(sendbuf, sendcounts, displs, c_sendtype, recvbuf, *recvcount,
                  c_recvtype, *root, c_comm);
 
     *ierr = (MPI_Fint)ret;
@@ -1121,7 +1184,11 @@ F77_MPI_ISCATTERV(const void  *sendbuf, const int  *sendcounts, const int  *disp
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Iscatterv(sendbuf, sendcounts, displs, c_sendtype, recvbuf, *recvcount,
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Iscatterv(MPI_IN_PLACE, sendcounts, displs, c_sendtype, recvbuf, *recvcount,
+                        c_recvtype, *root, c_comm, &c_request);
+    else
+        ret = MPI_Iscatterv(sendbuf, sendcounts, displs, c_sendtype, recvbuf, *recvcount,
                         c_recvtype, *root, c_comm, &c_request);
 
     *ierr = (MPI_Fint)ret;
