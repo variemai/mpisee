@@ -37,6 +37,8 @@ mpi_neighbor_allgather_(const void  *sendbuf, int  *sendcount, MPI_Fint  *sendty
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
+    // The IN_PLACE is not meaningful here
+
     ret = MPI_Neighbor_allgather(sendbuf, *sendcount, c_sendtype, recvbuf,
                                  *recvcount, c_recvtype, c_comm);
     *ierr = ret;
@@ -73,6 +75,8 @@ mpi_neighbor_allgatherv_(const void  *sendbuf, int  * sendcount, MPI_Fint *sendt
     MPI_Datatype c_sendtype;
     MPI_Datatype c_recvtype;
     MPI_Comm c_comm;
+
+    // MPI_IN_PLACE is not meaningful here
 
     c_sendtype = MPI_Type_f2c(*sendtype);
     c_recvtype = MPI_Type_f2c(*recvtype);
@@ -116,6 +120,8 @@ mpi_neighbor_alltoall_(const void  *sendbuf, int  * sendcount, MPI_Fint  *sendty
     c_sendtype = MPI_Type_f2c(*sendtype);
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
+
+    // IN PLACE not meaningful
 
     ret = MPI_Neighbor_alltoall(sendbuf, *sendcount, c_sendtype, recvbuf, *recvcount, c_recvtype, c_comm);
     *ierr = ret;

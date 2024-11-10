@@ -1243,7 +1243,11 @@ F77_MPI_SCATTER(const void  *sendbuf, int  * sendcount, MPI_Fint  * sendtype,
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Scatter(sendbuf, *sendcount, c_sendtype, recvbuf, *recvcount,
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Scatter(MPI_IN_PLACE, *sendcount, c_sendtype, recvbuf, *recvcount,
+                      c_recvtype, *root, c_comm);
+    else
+        ret = MPI_Scatter(sendbuf, *sendcount, c_sendtype, recvbuf, *recvcount,
                       c_recvtype, *root, c_comm);
 
     *ierr = (MPI_Fint)ret;
@@ -1298,8 +1302,12 @@ F77_MPI_ISCATTER(const void  *sendbuf, int  * sendcount, MPI_Fint  * sendtype,
     c_recvtype = MPI_Type_f2c(*recvtype);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Iscatter(sendbuf, *sendcount, c_sendtype, recvbuf, *recvcount,
-                       c_recvtype, *root, c_comm, &c_request);
+    if (sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Iscatter(MPI_IN_PLACE, *sendcount, c_sendtype, recvbuf, *recvcount,
+                        c_recvtype, *root, c_comm, &c_request);
+    else
+        ret = MPI_Iscatter(sendbuf, *sendcount, c_sendtype, recvbuf, *recvcount,
+                        c_recvtype, *root, c_comm, &c_request);
 
     *ierr = (MPI_Fint)ret;
     if ( ret == MPI_SUCCESS )
@@ -1345,7 +1353,11 @@ F77_MPI_SCAN(const void  *sendbuf, void  *recvbuf, int  * count, MPI_Fint  * dat
     c_op = PMPI_Op_f2c(*op);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Scan(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Scan(MPI_IN_PLACE, recvbuf, *count, c_datatype, c_op, c_comm);
+    else
+        ret = MPI_Scan(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm);
+
 
     *ierr = (MPI_Fint)ret;
     return;
@@ -1388,7 +1400,10 @@ F77_MPI_ISCAN(const void  *sendbuf, void  *recvbuf, int  * count, MPI_Fint  * da
     c_op = PMPI_Op_f2c(*op);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Iscan(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm, &c_request);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Iscan(MPI_IN_PLACE, recvbuf, *count, c_datatype, c_op, c_comm, &c_request);
+    else
+        ret = MPI_Iscan(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm, &c_request);
 
     *ierr = (MPI_Fint)ret;
     if ( ret == MPI_SUCCESS )
@@ -1430,7 +1445,11 @@ F77_MPI_EXSCAN(const void  *sendbuf, void  *recvbuf, int  * count, MPI_Fint  * d
     c_op = MPI_Op_f2c(*op);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Exscan(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Exscan(MPI_IN_PLACE, recvbuf, *count, c_datatype, c_op, c_comm);
+    else
+        ret = MPI_Exscan(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm);
+
     *ierr = ret;
     return;
 }
@@ -1471,7 +1490,11 @@ F77_MPI_IEXSCAN(const void  *sendbuf, void  *recvbuf, int  * count, MPI_Fint  * 
     c_op = MPI_Op_f2c(*op);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Iexscan(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm, &c_request);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Iexscan(MPI_IN_PLACE, recvbuf, *count, c_datatype, c_op, c_comm, &c_request);
+    else
+        ret = MPI_Iexscan(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm, &c_request);
+
     *ierr = ret;
     if ( ret == MPI_SUCCESS )
         *request = MPI_Request_c2f(c_request);
@@ -1585,7 +1608,11 @@ F77_MPI_REDUCE_SCATTER(const void  *sendbuf, void  *recvbuf, const int *recvcnts
     c_op = MPI_Op_f2c(*op);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Reduce_scatter(sendbuf, recvbuf, recvcnts, c_datatype, c_op, c_comm);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Reduce_scatter(MPI_IN_PLACE, recvbuf, recvcnts, c_datatype, c_op, c_comm);
+    else
+        ret = MPI_Reduce_scatter(sendbuf, recvbuf, recvcnts, c_datatype, c_op, c_comm);
+
     *ierr = (MPI_Fint)ret;
     return;
 
@@ -1630,7 +1657,11 @@ F77_MPI_IREDUCE_SCATTER(const void  *sendbuf, void  *recvbuf, const int *recvcnt
     c_op = MPI_Op_f2c(*op);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Ireduce_scatter(sendbuf, recvbuf, recvcnts, c_datatype, c_op, c_comm, &c_request);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Ireduce_scatter(MPI_IN_PLACE, recvbuf, recvcnts, c_datatype, c_op, c_comm, &c_request);
+    else
+        ret = MPI_Ireduce_scatter(sendbuf, recvbuf, recvcnts, c_datatype, c_op, c_comm, &c_request);
+
     *ierr = (MPI_Fint)ret;
     if ( ret == MPI_SUCCESS )
         *request = MPI_Request_c2f(c_request);
@@ -1674,7 +1705,11 @@ F77_MPI_REDUCE_SCATTER_BLOCK(const void *sendbuf, void *recvbuf, int *recvcount,
     c_op = MPI_Op_f2c(*op);
     c_comm = MPI_Comm_f2c(*comm);
 
-    ret = MPI_Reduce_scatter_block(sendbuf, recvbuf, *recvcount, c_datatype, c_op, c_comm);
+    if ( sendbuf == mpisee_fortran_mpi_in_place)
+        ret = MPI_Reduce_scatter_block(MPI_IN_PLACE, recvbuf, *recvcount, c_datatype, c_op, c_comm);
+    else
+        ret = MPI_Reduce_scatter_block(sendbuf, recvbuf, *recvcount, c_datatype, c_op, c_comm);
+
     *ierr = (MPI_Fint)ret;
     return;
 
