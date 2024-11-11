@@ -1,0 +1,33 @@
+# Use a lightweight Debian base image
+FROM debian:latest
+
+# Install required packages
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    gfortran \
+    cmake \
+    sqlite3- \
+    libsqlite3-dev \
+    mpich \
+    python3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up MPI environment variables
+ENV PATH="/usr/lib/x86_64-linux-gnu/mpich/bin:${PATH}"
+ENV LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu/mpich/lib:${LD_LIBRARY_PATH}"
+
+# Set working directory
+WORKDIR /mpisee-dev
+
+# Copy your application files if needed
+COPY src /mpisee-dev/src
+COPY test /mpisee-dev/test
+COPY mpisee-through /mpisee-dev/mpisee-through
+COPY CMakeLists.txt /mpisee-dev
+
+# Build the application using CMake
+RUN cmake -B build -S . -DCMAKE_Fortran_COMPILER=mpif90 . && cmake --build build
+
+# Command to test MPI installation
+CMD ["/bin/sh", "-c", "cd build && ctest"]

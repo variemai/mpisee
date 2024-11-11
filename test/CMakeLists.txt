@@ -96,17 +96,6 @@ add_custom_target(run_and_cleanup_tests
 )
 
 
-#set_property(TARGET ctest0 PROPERTY CROSSCOMPILING_EMULATOR '${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS}')
-# set(MPI_COMMAND mpirun -np 2 ctest0)
-# add_custom_command(
-#   TARGET ctest0
-#   POST_BUILD
-#   COMMAND ${MPI_CXXOMMAND})
-#   set(MPI_CXXOMMAND mpirun -np 2 ctest1)
-# add_custom_command(
-#   TARGET ctest1
-#   POST_BUILD
-#   COMMAND ${MPI_CXXOMMAND})
 target_include_directories(init.out PRIVATE ${MPI_CXX_INCLUDE_PATH})
 #target_compile_options(init PRIVATE ${MPI_CXX_COMPILE_FLAGS})
 target_link_libraries(init.out PRIVATE ${MPI_CXX_LIBRARIES} ${MPI_CXX_LINK_FLAGS})

@@ -42,28 +42,26 @@ string(REGEX MATCH "^([0-9]+)\\.([0-9]+)" _ ${PROJECT_VERSION})
 set(MPI_SEE_MAJOR_VERSION ${CMAKE_MATCH_1})
 set(MPI_SEE_MINOR_VERSION ${CMAKE_MATCH_2})
 # Generate the header file (the configure_file part remains the same)
-configure_file(utils.h.in ${CMAKE_SOURCE_DIR}/utils.h)
-message(STATUS "Generated utils.h in ${CMAKE_SOURCE_DIR}")
+configure_file(${CMAKE_SOURCE_DIR}/src/utils.h.in ${CMAKE_SOURCE_DIR}/src/utils.h)
+message(STATUS "Generated utils.h in ${CMAKE_SOURCE_DIR}/src")
 
 
 add_library(mpisee SHARED
-    commprof.cpp pt2pt_wrappers.cpp collectives_wrappers.cpp neighbor_wrappers.cpp onesided_wrappers.cpp utils.cpp create_db.cpp
-    mpisee_fortran.cpp mpisee_fortran_init.f90  # New files
+    src/commprof.cpp
+    src/pt2pt_wrappers.cpp
+    src/collectives_wrappers.cpp
+    src/neighbor_wrappers.cpp
+    src/onesided_wrappers.cpp
+    src/utils.cpp
+    src/create_db.cpp
+    src/mpisee_fortran.cpp
+    src/mpisee_fortran_init.f90
 )
-#target_include_directories(create_db PRIVATE ${MPI_CXX_INCLUDE_DIRS})
-#target_link_libraries(create_db PRIVATE ${MPI_CXX_LIBRARIES})
-target_include_directories(mpisee PRIVATE ${MPI_CXX_INCLUDE_DIRS})
-target_link_libraries(mpisee PRIVATE ${MPI_CXX_LIBRARIES})
-target_link_libraries(mpisee PRIVATE ${SQLite3_LIBRARIES})
-target_include_directories(mpisee PRIVATE ${SQLite3_INCLUDE_DIRS})
 
-#if(MPI_CXX_COMPILE_FLAGS)
-#    target_compile_options(mpisee PRIVATE ${MPI_CXX_COMPILE_FLAGS})
-#endif()
-#
-#if(MPI_CXX_LINK_FLAGS)
-#    set_target_properties(mpisee PROPERTIES LINK_FLAGS "${MPI_CXX_LINK_FLAGS}")
-#endif()
+
+target_include_directories(mpisee PRIVATE ${MPI_CXX_INCLUDE_DIRS} ${SQLite3_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(mpisee PRIVATE ${MPI_CXX_LIBRARIES} ${SQLite3_LIBRARIES})
+
 
 set_target_properties(mpisee PROPERTIES SOVERSION 1)
 #message(STATUS "Run: ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPI_CXX_INCLUDE_DIRS}")
