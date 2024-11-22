@@ -577,7 +577,7 @@ MPI_Alltoallw(const void *sendbuf, const int *sendcounts, const int *sdispls,
 }
 
 extern "C" {
-void F77_MPI_ALLTOALLW(void *sendbuf, const int *sendcnts, const int *sdispls,
+void mpi_alltoallw_(void *sendbuf, const int *sendcnts, const int *sdispls,
                         MPI_Fint * sendtypes, void *recvbuf, const int *recvcnts,
                         const int *rdispls, MPI_Fint *recvtypes, MPI_Fint *comm ,
                         MPI_Fint *ierr)
@@ -611,7 +611,6 @@ void F77_MPI_ALLTOALLW(void *sendbuf, const int *sendcnts, const int *sdispls,
             c_recvtypes[i] = MPI_Type_f2c(recvtypes[i]);
         }
     }
-
 
     ret = MPI_Alltoallw(sendbuf, sendcnts, sdispls, c_sendtypes, recvbuf,
                         recvcnts, rdispls, c_recvtypes, c_comm);
