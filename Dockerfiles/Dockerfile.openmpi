@@ -33,4 +33,4 @@ COPY CMakeLists.txt /mpisee-dev
 RUN cmake -B build -S . -DCMAKE_Fortran_COMPILER=mpif90 . && cmake --build build
 
 # Command to test MPI installation
-CMD ["/bin/sh", "-c", "cd build && ctest --output-on-failure"]
+CMD ["/bin/sh", "-c", "cd build && ctest -V"]

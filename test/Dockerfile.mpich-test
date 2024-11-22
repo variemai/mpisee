@@ -18,16 +18,7 @@ ENV PATH="/usr/lib/x86_64-linux-gnu/mpich/bin:${PATH}"
 ENV LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu/mpich/lib:${LD_LIBRARY_PATH}"
 
 # Set working directory
-WORKDIR /mpisee-dev
+WORKDIR /workspace
 
-# Copy your application files if needed
-COPY src /mpisee-dev/src
-COPY test /mpisee-dev/test
-COPY mpisee-through /mpisee-dev/mpisee-through
-COPY CMakeLists.txt /mpisee-dev
 
-# Build the application using CMake
-RUN cmake -B build -S . -DCMAKE_Fortran_COMPILER=mpif90 . && cmake --build build
-
-# Command to test MPI installation
-CMD ["/bin/sh", "-c", "cd build && ctest -V"]
+CMD ["/bin/sh"]
