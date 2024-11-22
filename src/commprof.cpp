@@ -391,21 +391,14 @@ F77_MPI_INIT_THREAD (int *required, int *provided, int *ierr)
     tmp = av;
     ret = _MPI_Init_thread(&ac, (char***)&tmp , *required, provided);
     mpisee_fortran_in_place_init();
+    mpisee_fortran_status_ignore_init();
+    mpisee_fortran_statuses_ignore_init();
+    mpisee_fortran_unweighted_init();
+    mpisee_fortran_bottom_init();
     *ierr = ret;
     return;
 }
 }
-
-/* void
-mpi_init_ (int *ierr){
-  int ret = 0;
-  char **tmp;
-  getProcCmdLine (&ac, av);
-  tmp = av;
-  ret = _MPI_Init (&ac, (char ***) &tmp);
-  *ierr = ret;
-  return;
-} */
 
 extern "C" {
 void
@@ -417,6 +410,10 @@ F77_MPI_INIT (int *ierr)
   tmp = av;
   ret = _MPI_Init (&ac, (char ***) &tmp);
   mpisee_fortran_in_place_init();
+  mpisee_fortran_status_ignore_init();
+  mpisee_fortran_statuses_ignore_init();
+  mpisee_fortran_unweighted_init();
+  mpisee_fortran_bottom_init();
   *ierr = ret;
   return;
 }
