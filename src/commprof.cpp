@@ -1,29 +1,43 @@
-#include "utils.h"
+/*****************************************************************************\
+* mpisee - is a lightweight MPI profiling tool focusing on communicators.
+* Copyright (C) 2024  Ioannis Vardas - vardas@par.tuwien.ac.at
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <https://www.gnu.org/licenses/>
+******************************************************************************/
+
+
+
+#include "commprof.h"
+#include <mpi.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <algorithm>
+#include <chrono>
 #include <climits>
+#include <cstdarg>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <mpi.h>
+#include <ctime>
+#include <iostream>
 #include <ostream>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <time.h>
-#include <unistd.h>
-#include <cstdarg>
 #include <unordered_map>
 #include <vector>
-#include "commprof.h"
-#include <algorithm>
-#include "symbols.h"
 #include "create_db.h"
-#include "utils.h.in"
-#include <iostream>
-#include <chrono>
 #include "mpisee_fortran.h"
+#include "utils.h"
 
 // int global_rank; // For debugging purposes
 int prof_enabled = 1;
@@ -383,7 +397,7 @@ MPI_Init_thread(int *argc, char ***argv, int required, int *provided)
 
 extern "C" {
 void
-F77_MPI_INIT_THREAD (int *required, int *provided, int *ierr)
+mpi_init_thread_ (int *required, int *provided, int *ierr)
 {
     char **tmp;
     int ret;
@@ -402,7 +416,7 @@ F77_MPI_INIT_THREAD (int *required, int *provided, int *ierr)
 
 extern "C" {
 void
-F77_MPI_INIT (int *ierr)
+mpi_init_ (int *ierr)
 {
   int ret = 0;
   char **tmp;
@@ -450,7 +464,7 @@ MPI_Comm_create(MPI_Comm comm, MPI_Group group, MPI_Comm *newcomm)
 
 extern "C" {
 void
-F77_MPI_COMM_CREATE(MPI_Fint  * comm, MPI_Fint  * group, MPI_Fint  *comm_out ,
+mpi_comm_create_(MPI_Fint  * comm, MPI_Fint  * group, MPI_Fint  *comm_out ,
                     MPI_Fint *ierr)
 {
     int ret;
@@ -489,7 +503,7 @@ MPI_Comm_split(MPI_Comm comm, int color, int key, MPI_Comm *newcomm)
 
 extern "C" {
 void
-F77_MPI_COMM_SPLIT(MPI_Fint  * comm, int  * color, int  * key,
+mpi_comm_split_(MPI_Fint  * comm, int  * color, int  * key,
                    MPI_Fint  *comm_out , MPI_Fint *ierr)
 {
     int ret;
@@ -520,7 +534,7 @@ MPI_Comm_dup(MPI_Comm comm, MPI_Comm *newcomm)
 
 extern "C" {
 void
-F77_MPI_COMM_DUP(MPI_Fint  * comm, MPI_Fint  *comm_out , MPI_Fint *ierr)
+mpi_comm_dup_(MPI_Fint  * comm, MPI_Fint  *comm_out , MPI_Fint *ierr)
 {
     int ret;
     MPI_Comm newcomm;
@@ -584,7 +598,7 @@ MPI_Cart_create(MPI_Comm old_comm, int ndims, const int *dims,
 
 extern "C" {
 void
-F77_MPI_CART_CREATE(MPI_Fint  * comm_old, int  * ndims, const int  *dims,
+mpi_cart_create_(MPI_Fint  * comm_old, int  * ndims, const int  *dims,
                     const int  *periods, int  * reorder,
                     MPI_Fint  *comm_cart , MPI_Fint *ierr)
 {
@@ -616,7 +630,7 @@ MPI_Cart_sub(MPI_Comm comm, const int *remain_dims, MPI_Comm *newcomm)
 
 extern "C" {
 void
-F77_MPI_CART_SUB(MPI_Fint  * comm, const int  *remain_dims,
+mpi_cart_sub_(MPI_Fint  * comm, const int  *remain_dims,
                  MPI_Fint  *comm_new , MPI_Fint *ierr)
 {
     int rc;
@@ -649,7 +663,7 @@ MPI_Graph_create(MPI_Comm comm_old, int nnodes, const int *index,
 
 extern "C" {
 void
-F77_MPI_GRAPH_CREATE(MPI_Fint  * comm_old, int  * nnodes, const int  *index,
+mpi_graph_create_(MPI_Fint  * comm_old, int  * nnodes, const int  *index,
                      const int  *edges, int  * reorder, MPI_Fint  *newcomm,
                      MPI_Fint *ierr)
 {
@@ -725,7 +739,7 @@ MPI_Comm_split_type(MPI_Comm comm, int split_type, int key, MPI_Info info,
 
 extern "C" {
 void
-F77_MPI_COMM_SPLIT_TYPE(MPI_Fint  * comm, int  * split_type, int  * key,
+mpi_comm_split_type_(MPI_Fint  * comm, int  * split_type, int  * key,
                         MPI_Fint *info, MPI_Fint  *newcomm , MPI_Fint *ierr)
 {
     int ret;
@@ -827,7 +841,7 @@ MPI_Wait(MPI_Request *request, MPI_Status *status)
 
 extern "C" {
 void
-F77_MPI_WAIT(MPI_Fint  *request, MPI_Status  *status , MPI_Fint *ierr)
+mpi_wait_(MPI_Fint  *request, MPI_Status  *status , MPI_Fint *ierr)
 {
    int ret;
    MPI_Request c_request;
@@ -879,7 +893,7 @@ MPI_Waitall(int count, MPI_Request array_of_requests[],
 
 extern "C" {
 void
-F77_MPI_WAITALL(int  * count, MPI_Fint  *array_of_requests,
+mpi_waitall_(int  *count, MPI_Fint  *array_of_requests,
                 MPI_Status  *array_of_statuses , MPI_Fint *ierr)
 {
 
@@ -942,7 +956,7 @@ MPI_Waitany(int count, MPI_Request *array_of_requests, int *index, MPI_Status *s
 
 extern "C" {
 void
-F77_MPI_WAITANY(int  * count, MPI_Fint  *array_of_requests, int  *index,
+mpi_waitany_(int  * count, MPI_Fint  *array_of_requests, int  *index,
                 MPI_Status  *status , MPI_Fint *ierr)
 {
     int ret,i;
@@ -1000,7 +1014,7 @@ MPI_Test(MPI_Request *request, int *flag, MPI_Status *status)
 
 extern "C" {
 void
-F77_MPI_TEST(MPI_Fint  *request, int  *flag, MPI_Status  *status , MPI_Fint *ierr)
+mpi_test_(MPI_Fint  *request, int  *flag, MPI_Status  *status , MPI_Fint *ierr)
 {
     int ret;
     MPI_Request c_request;
@@ -1057,7 +1071,7 @@ MPI_Testany(int count, MPI_Request *array_of_requests, int *index, int *flag, MP
 
 extern "C" {
 void
-F77_MPI_TESTANY(int  * count, MPI_Fint  *array_of_requests, int  *index,
+mpi_testany_(int  * count, MPI_Fint  *array_of_requests, int  *index,
                 int  *flag, MPI_Status  *status , MPI_Fint *ierr)
 {
 
@@ -1131,7 +1145,7 @@ MPI_Comm_free(MPI_Comm *comm)
 
 extern "C" {
 void
-F77_MPI_COMM_FREE(MPI_Fint *comm, MPI_Fint *ierr)
+mpi_comm_free_(MPI_Fint *comm, MPI_Fint *ierr)
 {
     int ret;
     MPI_Comm c_comm;
@@ -1538,7 +1552,7 @@ MPI_Finalize (void)
 
 extern "C" {
 void
-F77_MPI_FINALIZE (int *ierr)
+mpi_finalize_ (int *ierr)
 {
   int rc = 0;
 

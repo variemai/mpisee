@@ -1,5 +1,21 @@
+/*****************************************************************************\
+* This source file is part of mpisee
+* Copyright (C) 2024  Ioannis Vardas - vardas@par.tuwien.ac.at
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <https://www.gnu.org/licenses/>
+******************************************************************************/
 #include "commprof.h"
-#include "symbols.h"
 #include <mpi.h>
 
 int
@@ -23,7 +39,7 @@ MPI_Isend(const void *buf, int count, MPI_Datatype datatype,int dest, int tag,
 
 extern "C" {
 void
-F77_MPI_ISEND(const void  *buf, int  * count, MPI_Fint  * datatype,
+mpi_isend_(const void  *buf, int  * count, MPI_Fint  * datatype,
                           int  * dest, int  * tag, MPI_Fint  * comm,
                           MPI_Fint  *request , MPI_Fint *ierr)
 {
@@ -64,7 +80,7 @@ MPI_Send(const void *buf, int count, MPI_Datatype datatype,
 
 extern "C" {
 void
-F77_MPI_SEND(const void  *buf, int  * count, MPI_Fint  * datatype,
+mpi_send_(const void  *buf, int  * count, MPI_Fint  * datatype,
              int  * dest, int  * tag, MPI_Fint  * comm , MPI_Fint *ierr)
 {
     int ret;
@@ -102,7 +118,7 @@ MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag,
 
 extern "C" {
 void
-F77_MPI_IRECV(void  *buf, int  * count, MPI_Fint  * datatype, int  * source,
+mpi_irecv_(void  *buf, int  * count, MPI_Fint  * datatype, int  * source,
               int  * tag, MPI_Fint  * comm, MPI_Fint  *request , MPI_Fint *ierr)
 {
 
@@ -141,7 +157,7 @@ MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag,
 
 extern "C" {
 void
-F77_MPI_RECV(void* buf, int* count,MPI_Fint* datatype, int* source, int* tag,
+mpi_recv_(void* buf, int* count,MPI_Fint* datatype, int* source, int* tag,
              MPI_Fint  * comm, MPI_Status  *status , MPI_Fint *ierr)
 {
     int ret;
@@ -190,7 +206,7 @@ MPI_Sendrecv(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
 
 extern "C" {
 void
-F77_MPI_SENDRECV(const void  *sendbuf, int  * sendcount,MPI_Fint  * sendtype,
+mpi_sendrecv_(const void  *sendbuf, int  * sendcount,MPI_Fint  * sendtype,
                  int  * dest, int  * sendtag, void  *recvbuf, int  * recvcount,
                  MPI_Fint  * recvtype, int  * source, int  * recvtag,
                  MPI_Fint  * comm, MPI_Status  *status , MPI_Fint *ierr)
@@ -276,7 +292,7 @@ MPI_Ssend(const void *buf, int count, MPI_Datatype datatype, int dest,
 
 extern "C" {
 void
-F77_MPI_SSEND(const void *buf, int *count, MPI_Fint  *datatype,
+mpi_ssend_(const void *buf, int *count, MPI_Fint  *datatype,
               int  *dest, int  *tag, MPI_Fint  *comm , MPI_Fint *ierr)
 {
     int ret;
@@ -311,7 +327,7 @@ MPI_Issend(const void *buf, int count, MPI_Datatype datatype, int dest,
 
 extern "C"{
 void
-F77_MPI_ISSEND(const void *buf, int *count, MPI_Fint *datatype,
+mpi_issend_(const void *buf, int *count, MPI_Fint *datatype,
                int *dest, int *tag, MPI_Fint *comm,
                MPI_Fint *request , MPI_Fint *ierr)
 {
@@ -349,7 +365,7 @@ MPI_Bsend(const void *buf, int count, MPI_Datatype datatype, int dest,
 
 extern "C" {
 void
-F77_MPI_BSEND(const void *buf, int *count, MPI_Fint *datatype,
+mpi_bsend_(const void *buf, int *count, MPI_Fint *datatype,
               int *dest, int *tag, MPI_Fint *comm , MPI_Fint *ierr)
 {
     int ret;
@@ -383,7 +399,7 @@ MPI_Ibsend(const void *buf, int count, MPI_Datatype datatype, int dest,
 
 extern "C" {
 void
-F77_MPI_IBSEND(const void *buf, int *count, MPI_Fint *datatype,
+mpi_ibsend_(const void *buf, int *count, MPI_Fint *datatype,
                int *dest, int *tag, MPI_Fint *comm,
                MPI_Fint *request , MPI_Fint *ierr)
 {
@@ -421,7 +437,7 @@ MPI_Rsend(const void *buf, int count, MPI_Datatype datatype, int dest,
 
 extern "C" {
 void
-F77_MPI_RSEND(const void *buf, int *count, MPI_Fint *datatype,
+mpi_rsend_(const void *buf, int *count, MPI_Fint *datatype,
                int *dest, int *tag, MPI_Fint *comm , MPI_Fint *ierr)
 {
     int ret;
@@ -455,7 +471,7 @@ MPI_Irsend(const void *buf, int count, MPI_Datatype datatype, int dest,
 
 extern "C" {
 void
-F77_MPI_IRSEND(const void *buf, int *count, MPI_Fint *datatype,
+mpi_irsend_(const void *buf, int *count, MPI_Fint *datatype,
                int *dest, int *tag, MPI_Fint *comm,
                MPI_Fint *request , MPI_Fint *ierr)
 {
