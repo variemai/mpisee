@@ -7,6 +7,7 @@ add_executable(allgatherv_in_place.out allgatherv_inplace.f90)
 add_executable(allgather_in_place.out allgather_inplace.f90)
 add_executable(allreduce_in_place.out allreduce_inplace.f90)
 add_executable(reduce_in_place.out reduce_inplace.f90)
+add_executable(bcast_bottom.out bcast_bottom.f90)
 #add_executable(ctest0 ctest0.cpp)
 #add_executable(ctest1 ctest1.cpp)
 #add_executable(ctest_input ctest_input.cpp)
@@ -41,6 +42,9 @@ add_test(NAME see_through_allreduce_in_place COMMAND sh -c
 add_test(NAME reduce_in_place COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${PROJECT_BINARY_DIR}/test/reduce_in_place.out)
 add_test(NAME see_through_reduce_in_place COMMAND sh -c
     "python3 ${PROJECT_SOURCE_DIR}/mpisee-through/mpisee-through.py -i ${PROJECT_BINARY_DIR}/test/reduce_in_place.db | grep 'Reduce' > /dev/null 2>&1 && echo 'Reduce found' || (echo 'Reduce not found'; exit 1)" )
+add_test(NAME bcast_bottom COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${PROJECT_BINARY_DIR}/test/bcast_bottom.out)
+add_test(NAME see_through_bcast_bottom COMMAND sh -c "python3 ${PROJECT_SOURCE_DIR}/mpisee-through/mpisee-through.py -i ${PROJECT_BINARY_DIR}/test/bcast_bottom.db | grep 'Bcast' > /dev/null 2>&1 && echo 'Bcast found' || (echo 'Bcast not found'; exit 1)" )
+
 #add_test(NAME ctest0 COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/ctest0)
 #add_test(NAME ctest1 COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/ctest1)
 #add_test(NAME ctest_inputv COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/ctest_input -n 1032 -f file.txt -q abcdr -W -n 1032 -f file.txt -q abcdr -W -n 1032 -f file.txt -q abcdr -W)
@@ -56,13 +60,14 @@ set_tests_properties(allgather_in_place PROPERTIES ENVIRONMENT "MPISEE_OUTFILE=a
 set_tests_properties(allgatherv_in_place PROPERTIES ENVIRONMENT "MPISEE_OUTFILE=allgatherv_in_place.db")
 set_tests_properties(allreduce_in_place PROPERTIES ENVIRONMENT "MPISEE_OUTFILE=allreduce_in_place.db")
 set_tests_properties(reduce_in_place PROPERTIES ENVIRONMENT "MPISEE_OUTFILE=reduce_in_place.db")
+set_tests_properties(bcast_bottom PROPERTIES ENVIRONMENT "MPISEE_OUTFILE=bcast_bottom.db")
 
 set_tests_properties(see_through_init PROPERTIES DEPENDS init)
 set_tests_properties(see_through_allgather_in_place PROPERTIES DEPENDS allgather_in_place)
 set_tests_properties(see_through_allgatherv_in_place PROPERTIES DEPENDS allgatherv_in_place)
 set_tests_properties(see_through_allreduce_in_place PROPERTIES DEPENDS allreduce_in_place)
 set_tests_properties(see_through_reduce_in_place PROPERTIES DEPENDS reduce_in_place)
-
+set_tests_properties(see_through_bcast_bottom PROPERTIES DEPENDS bcast_bottom)
 
 
 target_link_libraries(init.out PUBLIC mpisee)
@@ -70,6 +75,7 @@ target_link_libraries(allgather_in_place.out PUBLIC mpisee)
 target_link_libraries(allgatherv_in_place.out PUBLIC mpisee)
 target_link_libraries(allreduce_in_place.out PUBLIC mpisee)
 target_link_libraries(reduce_in_place.out PUBLIC mpisee)
+target_link_libraries(bcast_bottom.out PUBLIC mpisee)
 #target_link_libraries(ctest0 PUBLIC mpisee)
 #target_link_libraries(ctest1 PUBLIC mpisee)
 #target_link_libraries(ctest_input PUBLIC mpisee)

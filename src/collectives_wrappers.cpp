@@ -36,7 +36,12 @@ F77_MPI_BCAST(void  *buffer, int  * count, MPI_Fint  * datatype, int  * root,
 
     c_datatype = MPI_Type_f2c(*datatype);
     c_comm = MPI_Comm_f2c(*comm);
-    ret = MPI_Bcast(buffer, *count, c_datatype, *root, c_comm);
+
+    if ( buffer == mpisee_fortran_mpi_bottom)
+        ret = MPI_Bcast(MPI_BOTTOM, *count, c_datatype, *root, c_comm);
+    else
+        ret = MPI_Bcast(buffer, *count, c_datatype, *root, c_comm);
+
     *ierr = ret;
 }
 }
