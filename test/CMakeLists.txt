@@ -42,7 +42,7 @@ add_test(NAME see_through_alltoallw_simple COMMAND sh -c "python3 ${PROJECT_SOUR
 
 # Always run cleanup as the last test
 add_test(NAME cleanup
-        COMMAND sh -c "echo 'Cleaning up test artifacts...' && rm -f ${PROJECT_BINARY_DIR}/test/*.db ${PROJECT_BINARY_DIR}/test/*.out"
+        COMMAND sh -c "echo 'Cleaning up test artifacts...' && rm -f ${PROJECT_BINARY_DIR}/test/*.db"
 )
 
 
