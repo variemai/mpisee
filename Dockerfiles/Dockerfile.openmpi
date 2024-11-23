@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     openmpi-bin \
     libopenmpi-dev \
     python3 \
+    gdb \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up MPI environment variables
@@ -21,16 +22,16 @@ ENV OMPI_ALLOW_RUN_AS_ROOT=1
 ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
 # Set working directory
-WORKDIR /mpisee-dev
-
-# Copy your application files if needed
-COPY src /mpisee-dev/src
-COPY test /mpisee-dev/test
-COPY mpisee-through /mpisee-dev/mpisee-through
-COPY CMakeLists.txt /mpisee-dev
-
-# Build the application using CMake
-RUN cmake -B build -S . -DCMAKE_Fortran_COMPILER=mpif90 . && cmake --build build
-
-# Command to test MPI installation
-CMD ["/bin/sh", "-c", "cd build && ctest -V"]
+# WORKDIR /mpisee-dev
+#
+# # Copy your application files if needed
+# COPY src /mpisee-dev/src
+# COPY test /mpisee-dev/test
+# COPY mpisee-through /mpisee-dev/mpisee-through
+# COPY CMakeLists.txt /mpisee-dev
+#
+# # Build the application using CMake
+# RUN cmake -B build -S . -DCMAKE_Fortran_COMPILER=mpif90 . && cmake --build build
+#
+# # Command to test MPI installation
+# CMD ["/bin/sh", "-c", "cd build && ctest -V"]

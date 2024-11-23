@@ -276,7 +276,7 @@ std::vector<std::string> convertToArrayOfPrims() {
 }
 
 
-int _MPI_Init(int *argc, char ***argv) {
+int mpisee_MPI_Init(int *argc, char ***argv) {
     int ret, rank, size;
     const auto start{std::chrono::steady_clock::now()};
     ret = PMPI_Init(argc, argv);
@@ -297,9 +297,12 @@ int _MPI_Init(int *argc, char ***argv) {
         appname = static_cast<char*>(malloc(sizeof(char) * 1024));
         appname = get_appname();
         std::cout << "MPI_Init: mpisee Profiling Tool version "
-          << MPISEE_MAJOR_VERSION << "." << MPISEE_MINOR_VERSION << "\n"
-          << "Profiling application " << appname << "\n";
-        fflush(stdout);
+          << MPISEE_MAJOR_VERSION << "." << MPISEE_MINOR_VERSION << "\n";
+        if (appname != NULL) {
+            std::cout << "Profiling application: " << appname << "\n";
+            free(appname);
+            fflush(stdout);
+        }
 #ifdef MPICH_NAME
         printf("MPICH library used\n");
 #endif
@@ -307,7 +310,6 @@ int _MPI_Init(int *argc, char ***argv) {
         printf("OpenMPI library used\n");
 #endif
         fflush(stdout);
-        free(appname);
     }
 
     alloc_init_commprof(MPI_COMM_WORLD, 'W');
@@ -323,7 +325,7 @@ int _MPI_Init(int *argc, char ***argv) {
 }
 
 
-static int _MPI_Init_thread(int *argc, char ***argv, int required,
+static int mpisee_MPI_Init_thread(int *argc, char ***argv, int required,
     int *provided) {
     int ret, rank, size;
     const auto start{std::chrono::steady_clock::now()};
@@ -345,9 +347,12 @@ static int _MPI_Init_thread(int *argc, char ***argv, int required,
         appname = static_cast<char*>(malloc(sizeof(char) * 1024));
         appname = get_appname();
         std::cout << "MPI_Init_thread: mpisee Profiling Tool version "
-          << MPISEE_MAJOR_VERSION << "." << MPISEE_MINOR_VERSION << "\n"
-          << "Profiling application " << appname << "\n";
-        fflush(stdout);
+          << MPISEE_MAJOR_VERSION << "." << MPISEE_MINOR_VERSION << "\n";
+        if (appname != NULL) {
+            std::cout << "Profiling application: " << appname << "\n";
+            free(appname);
+            fflush(stdout);
+        }
 #ifdef MPICH_NAME
         printf("MPICH library used\n");
 #endif
@@ -374,7 +379,7 @@ static int _MPI_Init_thread(int *argc, char ***argv, int required,
 int  MPI_Init_thread(int *argc, char ***argv, int required, int *provided) {
     if ( argc != NULL )
         getProcCmdLine(&ac, av);
-    return _MPI_Init_thread(argc, argv, required, provided);
+    return mpisee_MPI_Init_thread(argc, argv, required, provided);
 }
 
 
@@ -385,7 +390,7 @@ mpi_init_thread_(int *required, int *provided, int *ierr) {
     int ret;
     getProcCmdLine(&ac, av);
     tmp = av;
-    ret = _MPI_Init_thread(&ac, &tmp , *required, provided);
+    ret = mpisee_MPI_Init_thread(&ac, &tmp , *required, provided);
     mpisee_fortran_in_place_init();
     mpisee_fortran_status_ignore_init();
     mpisee_fortran_statuses_ignore_init();
@@ -402,7 +407,7 @@ mpi_init_(int *ierr) {
   char **tmp;
   getProcCmdLine(&ac, av);
   tmp = av;
-  ret = _MPI_Init(&ac, &tmp);
+  ret = mpisee_MPI_Init(&ac, &tmp);
   mpisee_fortran_in_place_init();
   mpisee_fortran_status_ignore_init();
   mpisee_fortran_statuses_ignore_init();
@@ -416,7 +421,7 @@ int MPI_Init(int *argc, char ***argv) {
     if ( argc != NULL ) {
         getProcCmdLine(&ac, av);
     }
-    return _MPI_Init(argc, argv);
+    return mpisee_MPI_Init(argc, argv);
 }
 
 /*
