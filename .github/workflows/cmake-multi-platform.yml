@@ -1,9 +1,9 @@
 
 on:
   push:
-    branches: ["main","fortran-env"]
+    branches: ["main","refactoring"]
   pull_request:
-    branches: ["main","fortran-env"]
+    branches: ["main","refactoring"]
 
 jobs:
   build:
