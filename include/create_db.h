@@ -49,7 +49,7 @@ void insertMetadata(sqlite3 *db, char *mpi_lib, int size, char *cmd[MAX_ARGS],
 
 int getCommId(sqlite3 *db, const std::string &commName);
 
-void insertIntoDataEntry(std::vector<DataEntry> &entries, int rank, int commId,
+void insertIntoDataEntry(std::vector<DataEntry> *entries, int rank, int commId,
                          int operationId, int bufferSizeMin, int bufferSizeMax,
                          int calls, double time, uint64_t volume);
 
@@ -58,7 +58,7 @@ void batchInsertToVolume(sqlite3 *db, const std::vector<VolEntry> &entries);
 void insertToVolume(sqlite3 *db, int operationId, int rank, int commId,
                     uint64_t volume);
 
-void insertIntoVolEntry(std::vector<VolEntry> &entries, int operationId,
+void insertIntoVolEntry(std::vector<VolEntry> entries, int operationId,
                         int rank, int commId, uint64_t volume);
 
 void executeBatchInsert(sqlite3 *db, const std::vector<DataEntry> &entries);

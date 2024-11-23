@@ -15,17 +15,19 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <https://www.gnu.org/licenses/>
 ******************************************************************************/
+
+#include "include/create_db.h"
+#include <fcntl.h>
+#include <sqlite3.h>
 #include <cstdint>
 #include <iostream>
-#include <sqlite3.h>
 #include <string>
 #include <iomanip>
 #include <sstream>
 #include <chrono>
 #include <vector>
 #include "include/utils.h"
-#include "include/create_db.h"
-#include <fcntl.h>
+
 
 
 int countTable(sqlite3 *db, const std::string& tablename) {
@@ -55,10 +57,14 @@ void printDataDetails(sqlite3* db) {
     if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             int rank = sqlite3_column_int(stmt, 0);
-            const char* machine = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
-            const char* commName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
-            const char* commSize = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
-            const char* operation = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+            const char* machine = reinterpret_cast<const char*>
+            (sqlite3_column_text(stmt, 1));
+            const char* commName = reinterpret_cast<const char*>
+            (sqlite3_column_text(stmt, 2));
+            const char* commSize = reinterpret_cast<const char*>
+            (sqlite3_column_text(stmt, 3));
+            const char* operation = reinterpret_cast<const char*>
+            (sqlite3_column_text(stmt, 4));
             int bufferSizeMin = sqlite3_column_int(stmt, 5);
             int bufferSizeMax = sqlite3_column_int(stmt, 6);
             int calls = sqlite3_column_int(stmt, 7);
@@ -68,14 +74,17 @@ void printDataDetails(sqlite3* db) {
                       << ", Machine: " << (machine ? machine : "NULL")
                       << ", Comm Name: " << (commName ? commName : "NULL")
                       << ", Comm Size: " << (commSize ? commSize : "NULL")
-                      << ", MPI Operation: " << (operation ? operation : "NULL")
-                      << ", Buffer Size: " << bufferSizeMin << " - " << bufferSizeMax
+                      << ", MPI Operation: "
+            << (operation ? operation : "NULL")
+                      << ", Buffer Size: " << bufferSizeMin
+            << " - " << bufferSizeMax
                       << ", Calls: " << calls
                       << ", Time: " << time << std::endl;
         }
         sqlite3_finalize(stmt);
     } else {
-        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+        << std::endl;
     }
 }
 
@@ -92,28 +101,34 @@ void printData(sqlite3* db) {
 
     if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
         // Print header
-        std::cout << std::left << std::setw(15) << "Comm Name" << std::setw(15) << "Comm Size"
-                  << std::setw(10) << "Rank" << std::setw(20) << "Operation"
-                  << std::setw(25) << "Buffer Size Range" << std::setw(15) << "Calls"
-                  << std::setw(20) << "Time" << std::endl;
+        std::cout << std::left << std::setw(15) << "Comm Name"
+        << std::setw(15) << "Comm Size" << std::setw(10) << "Rank"
+        << std::setw(20) << "Operation" << std::setw(25)
+        << "Buffer Size Range" << std::setw(15) << "Calls"
+        << std::setw(20) << "Time" << std::endl;
 
         // Print rows
         while (sqlite3_step(stmt) == SQLITE_ROW) {
           std::stringstream bufferSizeStream;
-            bufferSizeStream << sqlite3_column_int(stmt, 4) << " - " << sqlite3_column_int(stmt, 5);
+            bufferSizeStream << sqlite3_column_int(stmt, 4) << " - "
+            << sqlite3_column_int(stmt, 5);
             std::string bufferSize = bufferSizeStream.str();
 
-            std::cout << std::left << std::setw(15) << reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0))
-                      << std::setw(15) << reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1))
+            std::cout << std::left << std::setw(15)
+            << reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0))
+                      << std::setw(15)
+            << reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1))
                       << std::setw(10) << sqlite3_column_int(stmt, 2)
-                      << std::setw(20) << reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3))
-                      << std::setw(25) << bufferSize //sqlite3_column_int(stmt, 4) << " - " << sqlite3_column_int(stmt, 5)
-                      << std::setw(15) << sqlite3_column_int(stmt, 6)
-                      << std::setw(20) << sqlite3_column_double(stmt, 7) << std::endl;
+                      << std::setw(20)
+            << reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3))
+                      << std::setw(25) << bufferSize << std::setw(15)
+            << sqlite3_column_int(stmt, 6) << std::setw(20)
+            << sqlite3_column_double(stmt, 7) << std::endl;
         }
         sqlite3_finalize(stmt);
     } else {
-        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+        << std::endl;
     }
 }
 
@@ -143,37 +158,40 @@ int getCommId(sqlite3* db, const std::string& commName) {
         sqlite3_bind_text(stmt, 1, commName.c_str(), -1, SQLITE_STATIC);
 
         if (sqlite3_step(stmt) == SQLITE_ROW) {
-            commId = sqlite3_column_int(stmt, 0);  // Get the id from the query result
+            // Get the id from the query result
+            commId = sqlite3_column_int(stmt, 0);
         }
         sqlite3_finalize(stmt);
     } else {
-        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+        << std::endl;
     }
-    return commId; // return the retrieved ID
+    return commId;  // return the retrieved ID
 }
 
 int getMappingId(sqlite3* db, const std::string& machineName) {
     sqlite3_stmt* stmt;
     int mappingId = -1;  // Default to an invalid ID
 
-    std::string sql = "SELECT id FROM mappings WHERE machine = '" + machineName + "'";
+    std::string sql = "SELECT id FROM mappings WHERE machine = '"
+    + machineName + "'";
     if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
         sqlite3_bind_text(stmt, 1, machineName.c_str(), -1, SQLITE_STATIC);
 
         if (sqlite3_step(stmt) == SQLITE_ROW) {
-            mappingId = sqlite3_column_int(stmt, 0);  // Get the id from the query result
+            // Get the id from the query result
+            mappingId = sqlite3_column_int(stmt, 0);
         }
         sqlite3_finalize(stmt);
     } else {
-        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+        << std::endl;
     }
     return mappingId;
 }
 
 void setMetadata(sqlite3 *db, const std::string &key,
                  const std::string &value) {
-
-
   std::string sql = "INSERT INTO metadata (key, value) VALUES ('" + key +
                     "', '" + value + "')";
 
@@ -181,7 +199,8 @@ void setMetadata(sqlite3 *db, const std::string &key,
 }
 
 void insertMetadata(sqlite3 *db, char *mpi_lib, int size,
-                    char *cmd[MAX_ARGS], int ac, int mpisee_major_v, int mpisee_minor_v,
+                    char *cmd[MAX_ARGS], int ac, int mpisee_major_v,
+                    int mpisee_minor_v,
                     char *build_date, char *build_time, const char *env) {
   std::string lib = mpi_lib;
   std::string sz = std::to_string(size);
@@ -191,7 +210,7 @@ void insertMetadata(sqlite3 *db, char *mpi_lib, int size,
   std::string mpisee_date =
       std::string(build_date) + ", " + std::string(build_time);
 
-  if( env != NULL )
+  if ( env != NULL )
     std::string env_var = env;
   std::string combinedString;
   for (int i = 0; i < ac && i< MAX_ARGS && cmd[i] != NULL; ++i) {
@@ -215,7 +234,6 @@ void insertMetadata(sqlite3 *db, char *mpi_lib, int size,
   setMetadata(db, "mpisee version", mpisee_version);
   setMetadata(db, "mpisee build date", mpisee_date);
   setMetadata(db, "Profile date", profile_date);
-
 }
 
 
@@ -237,37 +255,36 @@ void printMetadata(sqlite3* db) {
 }
 
 void createTables(sqlite3* db) {
-
     // Create Mapping Table
-    const char* MappingTable =
+    constexpr const char* MappingTable =
         "CREATE TABLE IF NOT EXISTS mappings ("
         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
         "machine TEXT);";
     executeSQL(db, MappingTable, "Mappings Table created");
 
     // Create Execution Time Table
-    const char* ExecTimeTable =
+    constexpr const char* ExecTimeTable =
         "CREATE TABLE IF NOT EXISTS exectimes ("
         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
         "time REAL);";
     executeSQL(db, ExecTimeTable, "Execution Time Table created");
 
     // Create Metadata Table
-    const char* Metadata =
+    constexpr const char* Metadata =
         "CREATE TABLE IF NOT EXISTS metadata ("
         "key TEXT PRIMARY KEY, "
         "value TEXT);";
     executeSQL(db, Metadata, "Metadata Table created");
 
     // Create MPI Operations Table
-    const char* MPIOpsTable =
+    constexpr const char* MPIOpsTable =
         "CREATE TABLE IF NOT EXISTS operations ("
         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
         "operation TEXT);";
     executeSQL(db, MPIOpsTable, "MPI Operations Table created ");
 
     // Create Comms Table
-    const char* CommsTable =
+    constexpr const char* CommsTable =
         "CREATE TABLE IF NOT EXISTS comms ("
         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
         "name TEXT UNIQUE, "
@@ -288,7 +305,7 @@ void createTables(sqlite3* db) {
     // executeSQL(db, MPIOpsVolumeTable, "MPI Operations Volume Table created");
 
     // Create Data Table
-    const char* DataTable =
+    constexpr const char* DataTable =
         "CREATE TABLE IF NOT EXISTS data ("
         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
         "rank INTEGER, "
@@ -307,12 +324,14 @@ void createTables(sqlite3* db) {
 
 // Function to insert into mappings
 void insertIntoMappings(sqlite3 *db, const std::string &machine) {
-  std::string insertSql;
-  insertSql = "INSERT INTO mappings (id, machine) VALUES (0, '" + machine + "')";
-  executeSQL(db, insertSql, "INSERT INTO mappings");
+    std::string insertSql;
+    insertSql = R"(INSERT INTO mappings (id, machine)
+              VALUES (0, ')" + machine + "')";
+    executeSQL(db, insertSql, "INSERT INTO mappings");
 }
 
-void BatchInsertIntoMappings(sqlite3 *db, const std::vector<std::string>& machines) {
+void BatchInsertIntoMappings(sqlite3 *db,
+    const std::vector<std::string>& machines) {
   // Start a transaction
   executeSQL(db, "BEGIN TRANSACTION", "Start Transaction");
 
@@ -329,7 +348,8 @@ void BatchInsertIntoMappings(sqlite3 *db, const std::vector<std::string>& machin
 // Function to insert into mappings
 void insertIntoTimes(sqlite3 *db, const double time) {
   std::string insertSql;
-  insertSql = "INSERT INTO exectimes (id, time) VALUES (0, '" + std::to_string(time) + "')";
+  insertSql = "INSERT INTO exectimes (id, time) VALUES (0, '"
+    + std::to_string(time) + "')";
   executeSQL(db, insertSql, "INSERT INTO exectimes");
 }
 
@@ -339,7 +359,8 @@ void BatchInsertIntoTimes(sqlite3 *db, const std::vector<double> times) {
 
   for (const auto& time : times) {
     std::string insertSql;
-    insertSql = "INSERT INTO exectimes (time) VALUES ('" + std::to_string(time) + "')";
+    insertSql = "INSERT INTO exectimes (time) VALUES ('"
+      + std::to_string(time) + "')";
     executeSQL(db, insertSql, "INSERT INTO exectimes");
   }
 
@@ -352,16 +373,18 @@ int insertIntoComms(sqlite3 *db, const std::string &name, int size ) {
     int commId = 0;
     sqlite3_stmt *insertStmt;
     sqlite3_stmt *getIdStmt;
-    std::string insertSql = "INSERT OR IGNORE INTO comms (name, size) VALUES (?, ?)";
-    std::string getIdSql = "SELECT id FROM comms WHERE name = ?";
-    sqlite3_prepare_v2(db, insertSql.c_str(), -1, &insertStmt, nullptr);
+    constexpr const char* insertSql = R"(INSERT OR IGNORE INTO comms
+(name, size) VALUES (?, ?))";
+    constexpr const char* getIdSql = "SELECT id FROM comms WHERE name = ?";
+
+    sqlite3_prepare_v2(db, insertSql, -1, &insertStmt, nullptr);
     sqlite3_bind_text(insertStmt, 1, name.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_int(insertStmt, 2, size);
     sqlite3_step(insertStmt);
     sqlite3_finalize(insertStmt);
 
     // Get the ID of the comm
-    sqlite3_prepare_v2(db, getIdSql.c_str(), -1, &getIdStmt, nullptr);
+    sqlite3_prepare_v2(db, getIdSql, -1, &getIdStmt, nullptr);
     sqlite3_bind_text(getIdStmt, 1, name.c_str(), -1, SQLITE_STATIC);
     if (sqlite3_step(getIdStmt) == SQLITE_ROW) {
         commId = sqlite3_column_int(getIdStmt, 0);
@@ -370,60 +393,63 @@ int insertIntoComms(sqlite3 *db, const std::string &name, int size ) {
     return commId;
 }
 
-std::vector<int> CommsInsert(sqlite3 *db, const std::vector<CommData>& comms) {
-   sqlite3_stmt *insertStmt, *getIdStmt;
-   std::vector<int> ids;
-   int rc;
-   std::string insertSql =
+std::vector<int> CommsInsert(sqlite3 *db,
+    const std::vector<CommData>& comms) {
+    sqlite3_stmt *insertStmt, *getIdStmt;
+    std::vector<int> ids;
+    int rc;
+    std::string insertSql =
      "INSERT OR IGNORE INTO comms (name, size) VALUES (?, ?)";
-   std::string getIdSql = "SELECT id FROM comms WHERE name = ?";
+    std::string getIdSql = "SELECT id FROM comms WHERE name = ?";
 
-   rc = sqlite3_prepare_v2(db, insertSql.c_str(), -1, &insertStmt, nullptr);
-   if (rc != SQLITE_OK) {
-     std::cerr << "Failed to prepare insert statement: " << sqlite3_errmsg(db)
-               << std::endl;
-
-     return ids; // Return an empty vector or handle the error as appropriate
-   }
-   sqlite3_prepare_v2(db, getIdSql.c_str(), -1, &getIdStmt, nullptr);
-   if (rc != SQLITE_OK) {
+    rc = sqlite3_prepare_v2(db, insertSql.c_str(), -1, &insertStmt, nullptr);
+    if (rc != SQLITE_OK) {
+         std::cerr << "Failed to prepare insert statement: "
+        << sqlite3_errmsg(db) << std::endl;
+        return ids;
+    }
+    sqlite3_prepare_v2(db, getIdSql.c_str(), -1, &getIdStmt, nullptr);
+    if (rc != SQLITE_OK) {
      std::cerr << "Failed to prepare getId statement: " << sqlite3_errmsg(db)
                << std::endl;
-             sqlite3_finalize(insertStmt); // Clean up
-     return ids; // Return an empty vector or handle the error as appropriate
-   }
+             sqlite3_finalize(insertStmt);  // Clean up
+     return ids;
+    }
 
-   // Start transaction
-   executeSQL(db, "BEGIN TRANSACTION", "Start Transaction");
+    // Start transaction
+    executeSQL(db, "BEGIN TRANSACTION", "Start Transaction");
 
-   for (const auto& comm : comms) {
-     sqlite3_bind_text(insertStmt, 1, comm.name.c_str(), -1, SQLITE_STATIC);
-     sqlite3_bind_int(insertStmt, 2, comm.size);
-     rc = sqlite3_step(insertStmt);
+    for (const auto& comm : comms) {
+        sqlite3_bind_text(insertStmt, 1, comm.name.c_str(), -1,
+             SQLITE_STATIC);
+        sqlite3_bind_int(insertStmt, 2, comm.size);
+         rc = sqlite3_step(insertStmt);
      if (rc != SQLITE_DONE) {
        std::cerr << "Insert operation failed: " << sqlite3_errmsg(db)
                  << std::endl;
        break;
      }
-     sqlite3_reset(insertStmt); // Reset the statement to insert next record
+        // Reset the statement to insert next record
+        sqlite3_reset(insertStmt);
 
 
-     // Get the ID of the communicator
-     sqlite3_bind_text(getIdStmt, 1, comm.name.c_str(), -1, SQLITE_STATIC);
-     if (sqlite3_step(getIdStmt) == SQLITE_ROW) {
-       int id = sqlite3_column_int(getIdStmt, 0);
-       ids.push_back(id); // Store the ID
-     } else {
-       std::cerr << "Failed to get ID: " << sqlite3_errmsg(db) << std::endl;
-     }
-     sqlite3_reset(getIdStmt);
-   }
+        // Get the ID of the communicator
+        sqlite3_bind_text(getIdStmt, 1, comm.name.c_str(), -1, SQLITE_STATIC);
+        if (sqlite3_step(getIdStmt) == SQLITE_ROW) {
+            int id = sqlite3_column_int(getIdStmt, 0);
+            ids.push_back(id);  // Store the ID
+        } else {
+            std::cerr << "Failed to get ID: " << sqlite3_errmsg(db)
+            << std::endl;
+        }
+        sqlite3_reset(getIdStmt);
+    }
 
-   // Finalize statement and commit transaction
-   sqlite3_finalize(insertStmt);
-   sqlite3_finalize(getIdStmt);
-   executeSQL(db, "END TRANSACTION", "End Transaction");
-   return ids;
+    // Finalize statement and commit transaction
+    sqlite3_finalize(insertStmt);
+    sqlite3_finalize(getIdStmt);
+    executeSQL(db, "END TRANSACTION", "End Transaction");
+    return ids;
 }
 
 
@@ -437,7 +463,6 @@ void insertIntoOperations(sqlite3* db, const std::string& operation) {
     insertSql = "INSERT INTO operations (id, operation) VALUES (0, '" + operation + "')";
   } else {
     insertSql = "INSERT INTO operations (operation) VALUES ('" + operation + "')";
-
   }
   executeSQL(db, insertSql, "INSERT INTO operations");
 }
@@ -475,7 +500,7 @@ void insertIntoData(sqlite3* db, int rank, int commId, int operationId,
   executeSQL(db, insertSql, "INSERT INTO data");
 }
 
-void insertIntoDataEntry(std::vector<DataEntry> &entries, int rank, int commId,
+void insertIntoDataEntry(std::vector<DataEntry> *entries, int rank, int commId,
                          int operationId, int bufferSizeMin, int bufferSizeMax,
                          int calls, double time, uint64_t volume) {
   // Create a new DataEntry object and add it to the vector
@@ -490,11 +515,10 @@ void insertIntoDataEntry(std::vector<DataEntry> &entries, int rank, int commId,
     .time = time,
     .volume = volume
   };
-  // DataEntry entry = {rank, commId, operationId, bufferSizeMin, bufferSizeMax, calls, time};
-    entries.push_back(entry);
+    entries->push_back(entry);
 }
 
-void insertIntoVolEntry(std::vector<VolEntry> &entries, int operationId,
+void insertIntoVolEntry(std::vector<VolEntry> entries, int operationId,
                         int rank, int commId, uint64_t volume) {
     VolEntry entry = {
     .operationId = operationId,
@@ -506,13 +530,16 @@ void insertIntoVolEntry(std::vector<VolEntry> &entries, int operationId,
 }
 
 void executeBatchInsert(sqlite3* db, const std::vector<DataEntry>& entries) {
-
-    const std::string insertSql = "INSERT INTO data (rank, comm_id, operation_id, buffer_size_min, buffer_size_max, calls, time, volume) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
+    constexpr const char* insertSql = R"(
+INSERT INTO data (
+    rank, comm_id, operation_id, buffer_size_min, buffer_size_max, calls, time, volume
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+)";
     sqlite3_stmt *stmt;
-    int result = sqlite3_prepare_v2(db, insertSql.c_str(), -1, &stmt, nullptr);
+    int result = sqlite3_prepare_v2(db, insertSql, -1, &stmt, nullptr);
     if (result != SQLITE_OK) {
-        std::cerr << "Error preparing statement: " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "Error preparing statement: " << sqlite3_errmsg(db)
+        << std::endl;
         return;
     }
 
@@ -533,15 +560,13 @@ void executeBatchInsert(sqlite3* db, const std::vector<DataEntry>& entries) {
         if (result != SQLITE_DONE) {
             std::cerr << "Error during insert: " << sqlite3_errmsg(db) << std::endl;
         }
-
-        sqlite3_reset(stmt); // Reset bindings for the next insertion
+        sqlite3_reset(stmt);  // Reset bindings for the next insertion
     }
 
     // Commit the transaction
     executeSQL(db, "END TRANSACTION", "End Transaction");
 
     sqlite3_finalize(stmt);
-
 }
 
 
@@ -549,9 +574,9 @@ void printCommsTable(sqlite3* db) {
     sqlite3_stmt* stmt;
 
     // SQL query to select all records from the comms table
-    std::string sql = "SELECT id, name, size FROM comms";
+    constexpr const char* sql = "SELECT id, name, size FROM comms";
 
-    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
         std::cout << "Contents of comms table:" << std::endl;
         std::cout << "ID\tName\tSize" << std::endl;
         while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -599,7 +624,7 @@ void batchInsertToVolume(sqlite3 *db, const std::vector<VolEntry> &entries) {
             std::cerr << "Error during insert: " << sqlite3_errmsg(db) << std::endl;
         }
 
-        sqlite3_reset(stmt); // Reset bindings for the next insertion
+        sqlite3_reset(stmt);  // Reset bindings for the next insertion
     }
 
     // Commit the transaction
@@ -612,8 +637,7 @@ void batchInsertToVolume(sqlite3 *db, const std::vector<VolEntry> &entries) {
 
 // Function to get the current time and date, create a stringstream to
 // hold the output, create the condensed string and return the filename
-std::string createFilename(std::string prefix, std::string suffix)
-{
+std::string createFilename(std::string prefix, std::string suffix) {
     // Get the current time
     std::time_t time = std::time(nullptr);
     std::tm tm = *std::localtime(&time);

@@ -1436,7 +1436,7 @@ static int _Finalize(void) {
                     // << recv_data_buffer[i].num_messages << ", time: "
                     // << recv_data_buffer[i].time << ", volume: "
                     // << recv_data_buffer[i].volume << std::endl;
-                    insertIntoDataEntry(entries, proc, commId,
+                    insertIntoDataEntry(&entries, proc, commId,
                         recv_data_buffer[index].prim, minsize, maxsize,
                         recv_data_buffer[index].num_messages,
                         recv_data_buffer[index].time,
