@@ -656,15 +656,14 @@ std::string createFilename(std::string prefix, std::string suffix) {
 
 // Function to open SQLite database exclusively with retry mechanism
 sqlite3* openSQLiteDBExclusively(std::string prefix, std::string suffix,
-                                 int maxRetries, std::string &dbname)
-{
+                                 int maxRetries, std::string *dbname) {
     int retryCount = 0;
     std::string filename;
     sqlite3* db = NULL;
     int fd;
 
     do {
-        filename = createFilename(prefix,suffix);
+        filename = createFilename(prefix, suffix);
         // Use this file lock to ensure that the file is not opened by another process
         fd = open(filename.c_str(), O_RDWR | O_CREAT | O_EXCL, 0664);
         if (fd != -1) {
@@ -674,11 +673,11 @@ sqlite3* openSQLiteDBExclusively(std::string prefix, std::string suffix,
             if (rc == SQLITE_OK) {
                 std::cout << "mpisee: Opened database: " << filename <<
                   " exclusively after " << retryCount << " retries" << std::endl;
-                dbname = filename;
-                close(fd); // The handle (db) is now owned by SQLite
+                *dbname = filename;
+                close(fd);  // The handle (db) is now owned by SQLite
                 return db;
             } else {
-                mcpt_abort("Error opening database: %s",sqlite3_errmsg(db));
+                mcpt_abort("Error opening database: %s", sqlite3_errmsg(db));
                 if (db) {
                     close(fd);
                     sqlite3_close(db);

@@ -28,7 +28,7 @@
 #define MAX_ARG_STRING_SIZE 4096
 #define ENUM_TO_STRING(s) #s
 
-const char prim_names[][NUM_OF_PRIMS]={
+constexpr char prim_names[][NUM_OF_PRIMS]={
     ENUM_TO_STRING(Send),
     ENUM_TO_STRING(Recv),
     ENUM_TO_STRING(Isend),

@@ -9,15 +9,7 @@ add_executable(allreduce_in_place.out allreduce_inplace.f90)
 add_executable(reduce_in_place.out reduce_inplace.f90)
 add_executable(bcast_bottom.out bcast_bottom.f90)
 add_executable(alltoallw_simple.out alltoallw_simple.f90)
-#add_executable(ctest0 ctest0.cpp)
-#add_executable(ctest1 ctest1.cpp)
-#add_executable(ctest_input ctest_input.cpp)
-#add_executable(bcast_mt bcast_mt.cpp)
-#add_executable(bcast_reduce_mt bcast_reduce_mt.cpp)
-#add_executable(comm_create comm_create.cpp)
-#add_executable(comm_split comm_split.cpp)
-#add_executable(allg_rand_data allg_rand_data.cpp)
-#add_executable(comm_free comm_free.cpp)
+
 
 #find_program(SRUN_EXEC srun)
 #if(SRUN_EXEC)
@@ -48,15 +40,11 @@ add_test(NAME see_through_bcast_bottom COMMAND sh -c "python3 ${PROJECT_SOURCE_D
 add_test(NAME alltoallw_simple COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${PROJECT_BINARY_DIR}/test/alltoallw_simple.out)
 add_test(NAME see_through_alltoallw_simple COMMAND sh -c "python3 ${PROJECT_SOURCE_DIR}/mpisee-through/mpisee-through.py -i ${PROJECT_BINARY_DIR}/test/alltoallw_simple.db | grep 'Alltoallw' > /dev/null 2>&1 && echo 'Alltoallw found' || (echo 'Alltoallw not found'; exit 1)" )
 
-#add_test(NAME ctest0 COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/ctest0)
-#add_test(NAME ctest1 COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/ctest1)
-#add_test(NAME ctest_inputv COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/ctest_input -n 1032 -f file.txt -q abcdr -W -n 1032 -f file.txt -q abcdr -W -n 1032 -f file.txt -q abcdr -W)
-#add_test(NAME bcast_mt COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/bcast_mt)
-#add_test(NAME bcast_reduce_mt COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/bcast_reduce_mt)
-#add_test(NAME comm_create COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/comm_create)
-#add_test(NAME comm_split COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/comm_split)
-#add_test(NAME allg_rand_data COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/allg_rand_data)
-#add_test(NAME comm_free COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${PROJECT_BINARY_DIR}/test/comm_free)
+# Always run cleanup as the last test
+add_test(NAME cleanup
+        COMMAND sh -c "echo 'Cleaning up test artifacts...' && rm -f ${PROJECT_BINARY_DIR}/test/*.db ${PROJECT_BINARY_DIR}/test/*.out"
+)
+
 
 set_tests_properties(init PROPERTIES ENVIRONMENT "MPISEE_OUTFILE=init.db")
 set_tests_properties(allgather_in_place PROPERTIES ENVIRONMENT "MPISEE_OUTFILE=allgather_in_place.db")
@@ -82,17 +70,8 @@ target_link_libraries(allreduce_in_place.out PUBLIC mpisee)
 target_link_libraries(reduce_in_place.out PUBLIC mpisee)
 target_link_libraries(bcast_bottom.out PUBLIC mpisee)
 target_link_libraries(alltoallw_simple.out PUBLIC mpisee)
-#target_link_libraries(ctest0 PUBLIC mpisee)
-#target_link_libraries(ctest1 PUBLIC mpisee)
-#target_link_libraries(ctest_input PUBLIC mpisee)
-#target_link_libraries(bcast_mt PUBLIC mpisee)
-#target_link_libraries(bcast_reduce_mt PUBLIC mpisee)
-#target_link_libraries(comm_create PUBLIC mpisee)
-#target_link_libraries(comm_split PUBLIC mpisee)
-#target_link_libraries(allg_rand_data PUBLIC mpisee)
-#target_link_libraries(comm_free PUBLIC mpisee)
 
-add_custom_target(cleanup
+add_custom_target(manual_cleanup
         COMMAND ${CMAKE_COMMAND} -E rm -f ${PROJECT_BINARY_DIR}/test/*.db
         COMMAND ${CMAKE_COMMAND} -E rm -f ${PROJECT_BINARY_DIR}/test/*.out
         # Add more paths or file patterns as needed
@@ -104,7 +83,6 @@ add_custom_target(run_and_cleanup_tests
         COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
         COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target cleanup
         COMMENT "Running tests and cleaning up..."
-        DEPENDS init.out allreduce_in_place.out # Include other test executables as dependencies
 )
 
 

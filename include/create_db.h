@@ -77,6 +77,6 @@ void printData(sqlite3* db);
 
 void printCommsTable(sqlite3 *db);
 
-sqlite3* openSQLiteDBExclusively( std::string prefix, std::string suffix, int maxRetries, std::string &dbName);
+sqlite3* openSQLiteDBExclusively( std::string prefix, std::string suffix, int maxRetries, std::string *dbName);
 
 #endif

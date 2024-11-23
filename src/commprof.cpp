@@ -1316,7 +1316,7 @@ static int _Finalize(void) {
         } else {
             int maxRetries = 3600;
             db = openSQLiteDBExclusively("mpisee_", ".db", maxRetries,
-                outfile);
+                &outfile);
             if (db == NULL) {
                 std::string error_message = "Error: Failed to open SQLite "
                                             "database exclusively after " +
