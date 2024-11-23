@@ -15,9 +15,9 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <https://www.gnu.org/licenses/>
 ******************************************************************************/
-#include "commprof.h"
+#include "include/commprof.h"
 #include <mpi.h>
-#include "mpisee_fortran.h"
+#include "include/mpisee_fortran.h"
 
 int
 MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root,

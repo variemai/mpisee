@@ -15,7 +15,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <https://www.gnu.org/licenses/>
 ******************************************************************************/
-#include "mpisee_fortran.h"
+#include "include/mpisee_fortran.h"
 #include <stdio.h>
 
 void *mpisee_fortran_mpi_in_place = NULL;
