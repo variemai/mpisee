@@ -28,10 +28,10 @@
 #define MAX_ARG_STRING_SIZE 4096
 #define MAX_ARGS 1024
 #define MAX_ARG_SIZE 64
-#define NUM_BUCKETS @NUM_BUCKETS@
-#define MPISEE_MAJOR_VERSION @MPI_SEE_MAJOR_VERSION@
-#define MPISEE_MINOR_VERSION @MPI_SEE_MINOR_VERSION@
-const int64_t buckets[NUM_BUCKETS-1] = {@BUCKETS@};
+#define NUM_BUCKETS 8
+#define MPISEE_MAJOR_VERSION 4
+#define MPISEE_MINOR_VERSION 0
+const int64_t buckets[NUM_BUCKETS-1] = {128,1024,8192,65536,262144,1048576,33554432};
 
 
 // This is used to index the prim_names array
@@ -178,7 +178,7 @@ typedef struct PrimBucketInfo {
 }primBucketInfo;
 
 typedef struct comm_profiler {
-    std::unordered_map<int, primBucketInfo> map;
+    std::unordered_map<int, primBucketInfo> data_map;
 } comm_profiler;
 
 

@@ -15,16 +15,20 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <https://www.gnu.org/licenses/>
 ******************************************************************************/
-#include "utils.h"
+#include "include/utils.h"
 #include <stdio.h>
 #include <errno.h>
 #include <stdarg.h>
 #include <string.h>
 
+#ifdef __APPLE__
+#include <libproc.h>
+#endif
+
 #define MAX_ARG_STRING_SIZE 4096
 #define ENUM_TO_STRING(s) #s
 
-const char prim_names[][NUM_OF_PRIMS]={
+constexpr char prim_names[][NUM_OF_PRIMS]={
     ENUM_TO_STRING(Send),
     ENUM_TO_STRING(Recv),
     ENUM_TO_STRING(Isend),
@@ -116,36 +120,49 @@ void mcpt_abort (const char *fmt, ...){
   PMPI_Abort(MPI_COMM_WORLD, -1);
 }
 
-char *get_appname (void){
-  int pid, exelen, insize = 256;
-  char *inbuf = NULL, file[256];
+char* get_appname(void) {
+  int pid, exelen;
+  size_t insize = 256;
+  char* inbuf = NULL;
 
-  pid = getpid ();
-  snprintf (file, 256, "/proc/%d/exe", pid);
-  inbuf = (char*) malloc (insize);
-  if (inbuf == NULL){
-      mcpt_abort ("unable to allocate space for full executable path.\n");
+  pid = getpid();
+  inbuf = (char*)malloc(insize);
+  if (inbuf == NULL) {
+    fprintf(stderr, "unable to allocate space for full executable path.\n");
+    exit(EXIT_FAILURE);
   }
 
-  exelen = readlink (file, inbuf, 256);
-  if (exelen == -1){
-      if (errno != ENOENT){
-          while (exelen == -1 && errno == ENAMETOOLONG){
-              insize += 256;
-              inbuf =(char*) realloc (inbuf, insize);
-              exelen = readlink (file, inbuf, insize);
-          }
-          inbuf[exelen] = '\0';
-          return inbuf;
+#ifdef __linux__
+  char file[256];
+  snprintf(file, sizeof(file), "/proc/%d/exe", pid);
+
+  exelen = readlink(file, inbuf, insize);
+  if (exelen == -1) {
+    if (errno == ENOENT) {
+      free(inbuf);
+      return NULL;
+    }
+    while (exelen == -1 && errno == ENAMETOOLONG) {
+      insize += 256;
+      inbuf = (char*)realloc(inbuf, insize);
+      if (inbuf == NULL) {
+        fprintf(stderr, "unable to allocate space for full executable path.\n");
+        exit(EXIT_FAILURE);
       }
-      else
-        free (inbuf);
+      exelen = readlink(file, inbuf, insize);
+    }
   }
-  else{
-      inbuf[exelen] = '\0';
-      return inbuf;
+
+#elif __APPLE__
+  exelen = proc_pidpath(pid, inbuf, insize);
+  if (exelen <= 0) {
+    free(inbuf);
+    return NULL;
   }
-  return NULL;
+#endif
+
+  inbuf[exelen] = '\0';
+  return inbuf;
 }
 
 void getProcCmdLine(int *ac, char **av) {
