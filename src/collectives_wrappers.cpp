@@ -15,37 +15,32 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <https://www.gnu.org/licenses/>
 ******************************************************************************/
-#include "include/commprof.h"
 #include <mpi.h>
+#include "include/commprof.h"
 #include "include/mpisee_fortran.h"
 
 int
 MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root,
-          MPI_Comm comm)
-{
-    int ret,rank;
+          MPI_Comm comm) {
+    int ret, rank;
     double t_elapsed;
 
-    if ( prof_enabled == 1 ){
+    if ( prof_enabled == 1 ) {
         t_elapsed =  MPI_Wtime();
         ret = PMPI_Bcast(buffer, count, datatype, root, comm);
         t_elapsed = MPI_Wtime() - t_elapsed;
         PMPI_Comm_rank(comm, &rank);
-        profile_this(comm,count,datatype,Bcast,t_elapsed,0);
-    }
-    else{
+        profile_this(comm, count, datatype, Bcast, t_elapsed, 0);
+    } else {
         ret = PMPI_Bcast(buffer, count, datatype, root, comm);
     }
     return ret;
-
 }
 
 extern "C" {
 void
-mpi_bcast_(void  *buffer, int  * count, MPI_Fint  * datatype, int  * root,
-              MPI_Fint  * comm , MPI_Fint *ierr)
-{
-
+mpi_bcast_(void  *buffer, int  *count, MPI_Fint  *datatype, int  *root,
+              MPI_Fint  *comm, MPI_Fint *ierr) {
     int ret;
     MPI_Datatype c_datatype;
     MPI_Comm c_comm;
@@ -64,21 +59,17 @@ mpi_bcast_(void  *buffer, int  * count, MPI_Fint  * datatype, int  * root,
 
 int
 MPI_Ibcast(void *buffer, int count, MPI_Datatype datatype, int root,
-           MPI_Comm comm, MPI_Request *request)
-{
-    int ret,rank;
+           MPI_Comm comm, MPI_Request *request) {
+    int ret, rank;
     double t_elapsed;
-    if ( prof_enabled == 1 ){
+    if ( prof_enabled == 1 ) {
         t_elapsed =  MPI_Wtime();
         ret = PMPI_Ibcast(buffer, count, datatype, root, comm, request);
         t_elapsed = MPI_Wtime() - t_elapsed;
-
         PMPI_Comm_rank(comm, &rank);
-        profile_this(comm,count,datatype,Ibcast,t_elapsed,0);
+        profile_this(comm, count, datatype, Ibcast, t_elapsed, 0);
         requests_map[*request] = comm;
-    }
-    else{
-
+    } else {
         ret = PMPI_Ibcast(buffer, count, datatype, root, comm, request);
     }
     return ret;
@@ -86,9 +77,8 @@ MPI_Ibcast(void *buffer, int count, MPI_Datatype datatype, int root,
 
 extern "C" {
 void
-mpi_ibcast_(void  *buffer, int  * count, MPI_Fint  * datatype, int  * root,
-               MPI_Fint  * comm, MPI_Fint  *request , MPI_Fint *ierr)
-{
+mpi_ibcast_(void  *buffer, int  *count, MPI_Fint  *datatype, int  *root,
+               MPI_Fint  *comm, MPI_Fint  *request, MPI_Fint *ierr) {
     int ret;
     MPI_Datatype c_datatype;
     MPI_Comm c_comm;
@@ -99,7 +89,7 @@ mpi_ibcast_(void  *buffer, int  * count, MPI_Fint  * datatype, int  * root,
     if ( buffer == mpisee_fortran_mpi_bottom )
         buffer = MPI_BOTTOM;
 
-    ret = MPI_Ibcast(buffer, *count, c_datatype, *root, c_comm,&c_request);
+    ret = MPI_Ibcast(buffer, *count, c_datatype, *root, c_comm, &c_request);
     *ierr = ret;
     if ( ret == MPI_SUCCESS )
         *request = MPI_Request_c2f(c_request);
@@ -108,18 +98,16 @@ mpi_ibcast_(void  *buffer, int  * count, MPI_Fint  * datatype, int  * root,
 
 int
 MPI_Allreduce(const void *sendbuf, void *recvbuf, int count,
-              MPI_Datatype datatype, MPI_Op op, MPI_Comm comm)
-{
+              MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) {
     int ret;
     double t_elapsed;
-    if ( prof_enabled == 1 ){
+    if ( prof_enabled == 1 ) {
         t_elapsed =  MPI_Wtime();
         ret = PMPI_Allreduce(sendbuf, recvbuf, count, datatype, op, comm);
         t_elapsed = MPI_Wtime() - t_elapsed;
 
-        profile_this(comm,count,datatype,Allreduce,t_elapsed,0);
-    }
-    else{
+        profile_this(comm, count, datatype, Allreduce, t_elapsed, 0);
+    } else {
         ret = PMPI_Allreduce(sendbuf, recvbuf, count, datatype, op, comm);
     }
     return ret;
@@ -127,15 +115,13 @@ MPI_Allreduce(const void *sendbuf, void *recvbuf, int count,
 
 extern "C" {
 void
-mpi_allreduce_(void  *sendbuf, void  *recvbuf, int  * count,
-                  MPI_Fint  * datatype, MPI_Fint  * op, MPI_Fint  * comm ,
-                  MPI_Fint *ierr)
-{
+mpi_allreduce_(void  *sendbuf, void  *recvbuf, int  *count,
+                  MPI_Fint  *datatype, MPI_Fint  *op, MPI_Fint  *comm,
+                  MPI_Fint *ierr) {
     int ret;
     MPI_Op c_op;
     MPI_Comm c_comm;
     MPI_Datatype c_datatype;
-
     c_datatype = MPI_Type_f2c(*datatype);
     c_op = MPI_Op_f2c(*op);
     c_comm = MPI_Comm_f2c(*comm);
@@ -149,7 +135,7 @@ mpi_allreduce_(void  *sendbuf, void  *recvbuf, int  * count,
 
     ret = MPI_Allreduce(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm);
 
-    *ierr =ret;
+    *ierr = ret;
     return;
 }
 }
@@ -157,20 +143,20 @@ mpi_allreduce_(void  *sendbuf, void  *recvbuf, int  * count,
 int
 MPI_Iallreduce(const void *sendbuf, void *recvbuf, int count,
                MPI_Datatype datatype, MPI_Op op, MPI_Comm comm,
-               MPI_Request *request)
-{
+               MPI_Request *request) {
     int ret;
     double t_elapsed;
-    if (prof_enabled == 1){
+    if (prof_enabled == 1) {
         t_elapsed =  MPI_Wtime();
-        ret = PMPI_Iallreduce(sendbuf, recvbuf, count, datatype, op, comm, request);
+        ret = PMPI_Iallreduce(sendbuf, recvbuf, count, datatype, op, comm,
+            request);
         t_elapsed = MPI_Wtime() - t_elapsed;
 
         profile_this(comm, count, datatype, Iallreduce, t_elapsed, 0);
         requests_map[*request] = comm;
-    }
-    else{
-        ret = PMPI_Iallreduce(sendbuf, recvbuf, count, datatype, op, comm, request);
+    } else {
+        ret = PMPI_Iallreduce(sendbuf, recvbuf, count, datatype, op, comm,
+            request);
     }
     return ret;
 }
@@ -180,8 +166,7 @@ extern "C" {
 void
 mpi_iallreduce_(void  *sendbuf, void  *recvbuf, int  * count,
                    MPI_Fint  * datatype, MPI_Fint  * op, MPI_Fint  * comm,
-                   MPI_Fint  *request , MPI_Fint *ierr)
-{
+                   MPI_Fint  *request , MPI_Fint *ierr) {
     int ret;
     MPI_Datatype c_datatype;
     MPI_Op c_op;
@@ -192,7 +177,6 @@ mpi_iallreduce_(void  *sendbuf, void  *recvbuf, int  * count,
     c_op = MPI_Op_f2c(*op);
     c_comm = MPI_Comm_f2c(*comm);
 
-
     if ( sendbuf == mpisee_fortran_mpi_in_place)
         sendbuf = MPI_IN_PLACE;
     if ( sendbuf == mpisee_fortran_mpi_bottom )
@@ -200,13 +184,12 @@ mpi_iallreduce_(void  *sendbuf, void  *recvbuf, int  * count,
     if ( recvbuf == mpisee_fortran_mpi_bottom )
         recvbuf = MPI_BOTTOM;
 
-    ret = MPI_Iallreduce(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm, &c_request);
-
+    ret = MPI_Iallreduce(sendbuf, recvbuf, *count, c_datatype, c_op, c_comm,
+        &c_request);
 
     *ierr = ret;
     if ( ret == MPI_SUCCESS )
         *request = MPI_Request_c2f(c_request);
-    return;
 }
 }
 
