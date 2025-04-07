@@ -9,6 +9,7 @@ add_executable(allreduce_in_place.out allreduce_inplace.f90)
 add_executable(reduce_in_place.out reduce_inplace.f90)
 add_executable(bcast_bottom.out bcast_bottom.f90)
 add_executable(alltoallw_simple.out alltoallw_simple.f90)
+add_executable(waitall_mixed.out waitall_mixed.cpp)
 
 
 #find_program(SRUN_EXEC srun)
@@ -39,6 +40,8 @@ add_test(NAME bcast_bottom COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${PROJEC
 add_test(NAME see_through_bcast_bottom COMMAND sh -c "python3 ${PROJECT_SOURCE_DIR}/mpisee-through/mpisee-through.py -i ${PROJECT_BINARY_DIR}/test/bcast_bottom.db | grep 'Bcast' > /dev/null 2>&1 && echo 'Bcast found' || (echo 'Bcast not found'; exit 1)" )
 add_test(NAME alltoallw_simple COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${PROJECT_BINARY_DIR}/test/alltoallw_simple.out)
 add_test(NAME see_through_alltoallw_simple COMMAND sh -c "python3 ${PROJECT_SOURCE_DIR}/mpisee-through/mpisee-through.py -i ${PROJECT_BINARY_DIR}/test/alltoallw_simple.db | grep 'Alltoallw' > /dev/null 2>&1 && echo 'Alltoallw found' || (echo 'Alltoallw not found'; exit 1)" )
+add_test(NAME waitall_mixed COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${PROJECT_BINARY_DIR}/test/waitall_mixed.out)
+add_test(NAME see_through_waitall_mixed COMMAND sh -c "python3 ${PROJECT_SOURCE_DIR}/mpisee-through/mpisee-through.py -i ${PROJECT_BINARY_DIR}/test/waitall_mixed.db | grep '*0.0' > /dev/null 2>&1 && echo 'Communicator *0.0 found' || (echo 'Communicator *0.0 not found'; exit 1)" )
 
 # Always run cleanup as the last test
 add_test(NAME cleanup
@@ -53,6 +56,7 @@ set_tests_properties(allreduce_in_place PROPERTIES ENVIRONMENT "MPISEE_OUTFILE=a
 set_tests_properties(reduce_in_place PROPERTIES ENVIRONMENT "MPISEE_OUTFILE=reduce_in_place.db")
 set_tests_properties(bcast_bottom PROPERTIES ENVIRONMENT "MPISEE_OUTFILE=bcast_bottom.db")
 set_tests_properties(alltoallw_simple PROPERTIES ENVIRONMENT "MPISEE_OUTFILE=alltoallw_simple.db")
+set_tests_properties(waitall_mixed PROPERTIES ENVIRONMENT "MPISEE_OUTFILE=waitall_mixed.db")
 
 set_tests_properties(see_through_init PROPERTIES DEPENDS init)
 set_tests_properties(see_through_allgather_in_place PROPERTIES DEPENDS allgather_in_place)
@@ -61,6 +65,7 @@ set_tests_properties(see_through_allreduce_in_place PROPERTIES DEPENDS allreduce
 set_tests_properties(see_through_reduce_in_place PROPERTIES DEPENDS reduce_in_place)
 set_tests_properties(see_through_bcast_bottom PROPERTIES DEPENDS bcast_bottom)
 set_tests_properties(see_through_alltoallw_simple PROPERTIES DEPENDS alltoallw_simple)
+set_tests_properties(see_through_waitall_mixed PROPERTIES DEPENDS waitall_mixed)
 
 
 target_link_libraries(init.out PUBLIC mpisee)
@@ -70,6 +75,7 @@ target_link_libraries(allreduce_in_place.out PUBLIC mpisee)
 target_link_libraries(reduce_in_place.out PUBLIC mpisee)
 target_link_libraries(bcast_bottom.out PUBLIC mpisee)
 target_link_libraries(alltoallw_simple.out PUBLIC mpisee)
+target_link_libraries(waitall_mixed.out PUBLIC mpisee)
 
 add_custom_target(manual_cleanup
         COMMAND ${CMAKE_COMMAND} -E rm -f ${PROJECT_BINARY_DIR}/test/*.db

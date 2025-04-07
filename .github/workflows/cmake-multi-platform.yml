@@ -1,13 +1,13 @@
 
 on:
   push:
-    branches: ["main","refactoring"]
+    branches: ["main","refactoring","request-arrays"]
   pull_request:
-    branches: ["main","refactoring"]
+    branches: ["main","refactoring","request-arrays"]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: false

@@ -16,7 +16,6 @@
 * along with this program.  If not, see <https://www.gnu.org/licenses/>
 ******************************************************************************/
 
-#include "include/commprof.h"
 #include <mpi.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -35,6 +34,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include "include/commprof.h"
 #include "include/create_db.h"
 #include "include/mpisee_fortran.h"
 #include "include/utils.h"
@@ -52,8 +52,9 @@ std::unordered_map<MPI_Request, MPI_Comm> requests_map;
 std::unordered_map<MPI_Win, MPI_Comm> comm_map;
 std::vector<MPI_Comm> comms_table;
 std::vector<std::pair<MPI_Group, prof_attrs*>> group_table;
-std::vector<std::pair<prof_meta_pair*, MPI_Group>> free_array;
+std::vector<std::pair<prof_meta_pair *, MPI_Group>> free_array;
 
+MPI_Comm dummy_comm;
 
 /* Tool date */
 char mpisee_build_date[sizeof(__DATE__)] = __DATE__;
@@ -316,6 +317,11 @@ int mpisee_MPI_Init(int *argc, char ***argv) {
     comms_table.push_back(MPI_COMM_WORLD);
     profile_this(MPI_COMM_WORLD, 0, MPI_DATATYPE_NULL, Init, init_time, 0);
 
+    PMPI_Comm_dup(MPI_COMM_SELF, &dummy_comm);
+    // Initialize a dummy communicator for MPI_Waitall, MPI_Testany etc
+    alloc_init_commprof(dummy_comm, '*');
+    comms_table.push_back(dummy_comm);
+
     if ( argc != NULL )
         ac = *argc;
 
@@ -364,8 +370,13 @@ static int mpisee_MPI_Init_thread(int *argc, char ***argv, int required,
 
     alloc_init_commprof(MPI_COMM_WORLD, 'W');
     comms_table.push_back(MPI_COMM_WORLD);
-    profile_this(MPI_COMM_WORLD, 0, MPI_DATATYPE_NULL, Init_thread,
-                init_time, 0);
+    profile_this(MPI_COMM_WORLD, 0, MPI_DATATYPE_NULL, Init_thread, init_time,
+                 0);
+
+    PMPI_Comm_dup(MPI_COMM_SELF, &dummy_comm);
+    // Initialize a dummy communicator for MPI_Waitall, MPI_Testany etc
+    alloc_init_commprof(dummy_comm, '*');
+    comms_table.push_back(dummy_comm);
 
     if ( argc != NULL )
         ac = *argc;
@@ -795,15 +806,20 @@ MPI_Waitall(int count, MPI_Request array_of_requests[],
             MPI_Status array_of_statuses[]) {
     int ret, i;
     double t_elapsed;
-    MPI_Comm comm;
-    if ( prof_enabled == 1 ) {
-        for (i = 0; i < count; i++) {
-            auto it = requests_map.find(array_of_requests[i]);
-            if (it != requests_map.end()) {
-                comm = requests_map[array_of_requests[i]];
-                break;
-            }
-            comm = MPI_COMM_WORLD;
+    MPI_Comm comm, tmp_comm;
+    prof_metadata metadata, tmp_metadata;
+    int flag;
+    if (prof_enabled == 1) {
+        // Get the communicator associated with the first request and compare it
+        comm = requests_map[array_of_requests[0]];
+        PMPI_Comm_get_attr(comm, keys[0], &metadata, &flag);
+        for (i = 1; i < count; i++) {
+          tmp_comm = requests_map[array_of_requests[i]];
+          PMPI_Comm_get_attr(tmp_comm, keys[0], &tmp_metadata, &flag);
+          if (metadata.comms != tmp_metadata.comms ||
+              metadata.id != tmp_metadata.id) {
+              comm = dummy_comm;
+          }
         }
         t_elapsed = MPI_Wtime();
         ret = PMPI_Waitall(count, array_of_requests, array_of_statuses);
@@ -869,6 +885,8 @@ MPI_Waitany(int count, MPI_Request *array_of_requests, int *index,
             profile_this(comm_array[*index], 0, MPI_DATATYPE_NULL,  Waitany,
                 t_elapsed, 1);
             requests_map.erase(array_of_requests[*index]);
+        } else {
+            profile_this(dummy_comm, 0, MPI_DATATYPE_NULL, Waitany, t_elapsed, 1);
         }
         free(comm_array);
     } else {
@@ -917,6 +935,7 @@ MPI_Test(MPI_Request *request, int *flag, MPI_Status *status) {
                 requests_map.erase(*request);
             }
         } else {
+            profile_this(dummy_comm, 0, MPI_DATATYPE_NULL, Test, t_elapsed, 1);
             return ret;
         }
     } else {
@@ -966,6 +985,8 @@ int MPI_Testany(int count, MPI_Request *array_of_requests, int *index,
             if ( *flag == 1 ) {
                 requests_map.erase(array_of_requests[*index]);
             }
+        } else {
+            profile_this(dummy_comm, 0, MPI_DATATYPE_NULL, Testany, t_elapsed, 1);
         }
         free(comm_array);
     } else {
@@ -993,6 +1014,45 @@ void mpi_testany_(int  * count, MPI_Fint  *array_of_requests, int  *index,
 }
 }
 
+
+int MPI_Testall(int count, MPI_Request *array_of_requests, int *flag,
+                MPI_Status *array_of_statuses) {
+    int ret, i;
+    double t_elapsed;
+    MPI_Comm comm, tmp_comm;
+    prof_metadata metadata, tmp_metadata;
+    int tmp_flag;
+    if (prof_enabled == 1) {
+        // Get the communicator associated with the first request and compare it
+        comm = requests_map[array_of_requests[0]];
+        PMPI_Comm_get_attr(comm, keys[0], &metadata, &tmp_flag);
+        for (i = 1; i < count; i++) {
+          tmp_comm = requests_map[array_of_requests[i]];
+          PMPI_Comm_get_attr(tmp_comm, keys[0], &tmp_metadata, &tmp_flag);
+          if (metadata.comms != tmp_metadata.comms ||
+              metadata.id != tmp_metadata.id) {
+              comm = dummy_comm;
+          }
+        }
+        t_elapsed = MPI_Wtime();
+        ret = PMPI_Testall(count, array_of_requests, flag, array_of_statuses);
+        t_elapsed = MPI_Wtime() - t_elapsed;
+        if ( comm != MPI_COMM_NULL ) {
+            profile_this(comm, 0, MPI_DATATYPE_NULL, Testany, t_elapsed, 1);
+            for (i = 0; i < count; i++) {
+                requests_map.erase(array_of_requests[i]);
+            }
+        } else {
+             mcpt_abort("NULL COMMUNICATOR in MPI_Waitall\n");
+             return ret;
+        }
+    } else {
+        ret = PMPI_Waitall(count, array_of_requests, array_of_statuses);
+    }
+    return ret;
+
+
+}
 
 
 int MPI_Comm_free(MPI_Comm *comm) {
@@ -1102,12 +1162,16 @@ static int _Finalize(void) {
     num_of_comms = comms_table.size();
 
     for (uint32_t i = 0; i < num_of_comms; ++i) {
-        PMPI_Comm_get_attr(comms_table[i], keys[0], &metadata, &flag);
+      PMPI_Comm_get_attr(comms_table[i], keys[0], &metadata, &flag);
+      if (metadata->id != '*') {
         buf[0] = rank;
         buf[1] = metadata->comms;
         PMPI_Bcast(buf, 2, MPI_INT, 0, comms_table[i]);
         overwrite_name(&metadata, buf[0], buf[1]);
         snprintf(comm_meta.name, sizeof(comm_meta.name), "%s", metadata->name);
+      } else {
+          snprintf(comm_meta.name, sizeof(comm_meta.name), "*0.0");
+      }
         comm_meta.size = metadata->size;
         datasize = 0;
         PMPI_Comm_get_attr(comms_table[i], keys[1], &comm_prof_data, &flag);
@@ -1458,7 +1522,7 @@ static int _Finalize(void) {
 //        free(proc_names);
 //        free(alltimes);
     }
-
+    PMPI_Comm_free(&dummy_comm);
     PMPI_Barrier(MPI_COMM_WORLD);
     PMPI_Type_free(&MPI_COMM_DATA);
     return PMPI_Finalize();
