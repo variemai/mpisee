@@ -36,6 +36,7 @@ extern int local_cid;
 extern int my_coms;
 extern int keys[2]; // keyval[0]  contains metadata
                       // keyval[1]  contains profiling data
+extern MPI_Comm dummy_comm;
 
 extern "C" {
 int

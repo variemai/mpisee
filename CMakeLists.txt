@@ -12,6 +12,7 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall")
 
@@ -37,6 +38,7 @@ endif()
 string(REGEX MATCH "^([0-9]+)\\.([0-9]+)" _ ${PROJECT_VERSION})
 set(MPI_SEE_MAJOR_VERSION ${CMAKE_MATCH_1})
 set(MPI_SEE_MINOR_VERSION ${CMAKE_MATCH_2})
+
 
 configure_file(${CMAKE_SOURCE_DIR}/utils.h.in ${CMAKE_SOURCE_DIR}/include/utils.h)
 message(STATUS "Generated utils.h in ${CMAKE_SOURCE_DIR}/include")
