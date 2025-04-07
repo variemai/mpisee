@@ -12,8 +12,6 @@ int main(int argc, char *argv[]) {
     MPI_Status statuses[2];
 
     int send_buf_world, recv_buf_world;
-    int send_buf_local, recv_buf_local;
-    int partner_local_rank;
 
     // Initialize MPI
     MPI_Init(&argc, &argv);
@@ -39,31 +37,10 @@ int main(int argc, char *argv[]) {
 
     // --- Communication Phase ---
 
-    // 1. Non-blocking operation on MPI_COMM_WORLD
     send_buf_world = world_rank; // Simple data
     MPI_Iallreduce(&send_buf_world, &recv_buf_world, 1, MPI_INT, MPI_SUM,
                    MPI_COMM_WORLD, &requests[0]);
-    // In MPisee's context, requests[0] would be associated with MPI_COMM_WORLD
-
     MPI_Ibcast(&send_buf_world, 1, MPI_INT, 0, comm_local, &requests[1]);
-
-    // // 2. Non-blocking Send/Receive within the local communicator
-    // send_buf_local = world_rank * 10; // Different data
-    // recv_buf_local = -1; // Initialize receive buffer
-    // partner_local_rank = 1 - local_rank; // Partner is the other rank in the 2-process local comm
-
-    // // Use local ranks for communication within comm_local
-    // if (local_rank == 0) {
-    //      // Rank 0 in local comm sends to rank 1 in local comm
-    //     MPI_Isend(&send_buf_local, 1, MPI_INT, partner_local_rank, 1, // tag 1
-    //               comm_local, &requests[1]);
-    //     // In MPisee's context, requests[1] would be associated with comm_local
-    // } else { // local_rank == 1
-    //     // Rank 1 in local comm receives from rank 0 in local comm
-    //     MPI_Irecv(&recv_buf_local, 1, MPI_INT, partner_local_rank, 1, // tag 1
-    //               comm_local, &requests[1]);
-    //     // In MPisee's context, requests[1] would be associated with comm_local
-    // }
 
 
     // --- Wait Phase ---

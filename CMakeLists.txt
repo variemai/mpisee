@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(mpisee VERSION 4.0 DESCRIPTION "mpisee: A communicator-centric profiler" LANGUAGES CXX Fortran)
+project(mpisee VERSION 4.1 DESCRIPTION "mpisee: A communicator-centric profiler" LANGUAGES CXX Fortran)
 
 find_package(MPI)
 if(NOT MPI_FOUND)
