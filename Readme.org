@@ -82,13 +82,15 @@ If you found this useful please cite:
 [[https://ieeexplore.ieee.org/document/9835659][Link to IEEE Xplore]]
 ** Bibtex
 #+begin_src bibtex
-@INPROCEEDINGS{mpisee,
-  author={Vardas, Ioannis and Hunold, Sascha and Ajanohoun, Jordy I. and Träff, Jesper Larsson},
-  booktitle={2022 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW)},
-  title={mpisee: MPI Profiling for Communication and Communicator Structure},
-  year={2022},
-  volume={},
-  number={},
-  pages={520-529},
-  doi={10.1109/IPDPSW55747.2022.00092}}
+@article{https://doi.org/10.1002/cpe.70158,
+author = {Vardas, Ioannis and Larsson Träff, Jesper and Laso, Ruben and Hunold, Sascha},
+title = {Mpisee: Communicator-Centric Profiling of MPI Applications},
+journal = {Concurrency and Computation: Practice and Experience},
+volume = {37},
+number = {15-17},
+pages = {e70158},
+keywords = {High-Perfomance Computing, HPC, Message Passing Interface, MPI, parallel computing, performance analysis, performance profiling},
+doi = {https://doi.org/10.1002/cpe.70158},
+url = {https://onlinelibrary.wiley.com/doi/abs/10.1002/cpe.70158},
+year = {2025}}
 #+end_src
